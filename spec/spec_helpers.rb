@@ -13,10 +13,13 @@ module Helpers
 
   def js(s)
 
+    File.open('spec/source.js', 'wb') do |f|
+      f.puts(File.read('../jaabro/src/jaabro.js'))
+      f.puts(File.read('src/saintmarc.js'))
+    end
+
     ExecJS
-      .compile(
-        File.read('../jaabro/src/jaabro.js') + "\n" +
-        File.read('src/saintmarc.js'))
+      .compile(File.read('spec/source.js'))
       .exec(s)
   end
 end

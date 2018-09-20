@@ -6,3 +6,5 @@
 .errors
 .bxsinfo.yaml
 
+spec/source.js
+
