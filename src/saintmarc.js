@@ -21,6 +21,7 @@
 //
 // Made in Japan
 
+
 var SaintMarc = (function() {
 
   "use strict";
@@ -29,11 +30,32 @@ var SaintMarc = (function() {
 
   this.VERSION = '0.9.0';
 
+  var Parser = Jaabro.makeParser(function() {
+
+    // parse
+
+    function olline(i) { return rex('olline', i, /^\d+\. .+$/); }
+    function ulline(i) { return rex('ulline', i, /^\[-*] .+$/); }
+    function pline(i) { return rex('pline', i, /^..*$/); }
+
+    function line(i) { return alt('line', i, ulline, olline, pline); }
+    function doc(i) { return rep(null, i, line, 1); }
+
+    var root = doc;
+
+    // rewrite
+  });
+
   //
   // protected methods
 
   //
   // public methods
+
+  this.parse = function(s) {
+
+    return Parser.parse(s);
+  };
 
   //
   // done.

@@ -14,7 +14,9 @@ module Helpers
   def js(s)
 
     ExecJS
-      .compile(File.read('../jaabro/src/jaabro.js'))
+      .compile(
+        File.read('../jaabro/src/jaabro.js') + "\n" +
+        File.read('src/saintmarc.js'))
       .exec(s)
   end
 end
