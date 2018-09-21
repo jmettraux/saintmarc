@@ -22,7 +22,7 @@
 // Made in Japan
 
 
-var Jaabro = { VERSION: '1.1.1' };
+var Jaabro = { VERSION: '1.1.1' }; // a44b5e2e189002c82ffd2d9fc12dfec59c404463
 
 //
 // Jaabro.Input
@@ -43,6 +43,9 @@ Jaabro.Input.match = function(str_or_rex) {
     return this.slice(this.offset, l) === str_or_rex ? l : -1;
   }
 
+//clog(this.slice(this.offset));
+//clog(JSON.stringify(this.slice(this.offset)));
+//clog(str_or_rex);
   var m = this.slice(this.offset).match(str_or_rex);
   return m !== null && m.index == 0 ? m[0].length : -1;
 };

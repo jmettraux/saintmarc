@@ -34,17 +34,29 @@ var SaintMarc = (function() {
 
     // parse
 
-    function olline(i) { return rex('olline', i, /^\d+\. .+$/); }
-    function ulline(i) { return rex('ulline', i, /^\[-*] .+$/); }
-    function pline(i) { return rex('pline', i, /^..*$/); }
+    function olline(i) {
+      return rex('olline', i, /^\d+\.[\t ]+[^\n\r]*[\n\r]/); }
+    function ulline(i) {
+      return rex('olline', i, /^[-*][\t ]+[^\n\r]*[\n\r]/); }
+    function pline(i) {
+      return rex('pline', i, /^[^\n\r]*[\n\r]/); }
 
-    //function line(i) { return alt('line', i, ulline, olline, pline); }
-    function line(i) { return rex('line', i, /.+\n?/); }
-    function doc(i) { return rep(null, i, line, 1); }
+    function line(i) { return alt(null, i, ulline, olline, pline); }
+    function doc(i) { return rep('doc', i, line, 1); }
 
     var root = doc;
 
     // rewrite
+
+    function rewrite_line(t) {
+clog(t);
+      return t;
+    };
+
+    function rewrite_doc(t) {
+clog(t);
+      return t;
+    };
   });
 
   //
