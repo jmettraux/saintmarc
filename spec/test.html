@@ -4,7 +4,10 @@
   <head>
     <title>test</title>
     <script src="../../h.js/src/h.js"></script>
+
     <script src="../../jaabro/src/jaabro.js"></script>
+    <script src="jaabro.js"></script> <!-- if present -->
+
     <script src="../src/saintmarc.js"></script>
     <!--script src="helpers.js"></script-->
     <style>
@@ -26,7 +29,8 @@
       var clog = console.log;
       var print = function(o) {
         var pre = H.elt('#out');
-        var t = JSON.stringify(o);
+        //var t = JSON.stringify(o);
+        var t = (typeof o === 'string') ? o : JSON.stringify(o);
         pre.textContent = pre.textContent + t + "\n";
       };
       var s =
@@ -36,6 +40,7 @@
       print(s);
       var o = SaintMarc.parse(s);
       print(o);
+      print('.');
     </script>
 
   </body>
