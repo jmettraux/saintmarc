@@ -38,7 +38,8 @@ var SaintMarc = (function() {
     function ulline(i) { return rex('ulline', i, /^\[-*] .+$/); }
     function pline(i) { return rex('pline', i, /^..*$/); }
 
-    function line(i) { return alt('line', i, ulline, olline, pline); }
+    //function line(i) { return alt('line', i, ulline, olline, pline); }
+    function line(i) { return rex('line', i, /.+\n?/); }
     function doc(i) { return rep(null, i, line, 1); }
 
     var root = doc;
@@ -53,6 +54,8 @@ var SaintMarc = (function() {
   // public methods
 
   this.parse = function(s) {
+
+    if (typeof s !== 'string') return null;
 
     return Parser.parse(s);
   };

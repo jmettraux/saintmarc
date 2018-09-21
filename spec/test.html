@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+
+  <head>
+    <title>test</title>
+    <script src="../../h.js/src/h.js"></script>
+    <script src="../../jaabro/src/jaabro.js"></script>
+    <script src="../src/saintmarc.js"></script>
+    <!--script src="helpers.js"></script-->
+    <style>
+      pre {
+        border: 1px solid black;
+        height: 42em;
+        padding: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <h1>saintmarc</h1>
+
+    <pre id="out"></pre>
+
+    <script>
+      var clog = console.log;
+      var print = function(o) {
+        var pre = H.elt('#out');
+        var t = JSON.stringify(o);
+        pre.textContent = pre.textContent + t + "\n";
+      };
+      var s =
+        'This is our test\n' +
+        '\n' +
+        'This is another paragraph\n';
+      print(s);
+      var o = SaintMarc.parse(s);
+      print(o);
+    </script>
+
+  </body>
+</html>
+
