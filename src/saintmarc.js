@@ -18,7 +18,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//
+
 // Made in Japan
 
 
@@ -34,29 +34,42 @@ var SaintMarc = (function() {
 
     // parse
 
-    function olline(i) {
-      return rex('olline', i, /^\d+\.[\t ]+[^\n\r]*[\n\r]/); }
-    function ulline(i) {
-      return rex('olline', i, /^[-*][\t ]+[^\n\r]*[\n\r]/); }
-    function pline(i) {
-      return rex('pline', i, /^[^\n\r]*[\n\r]/); }
+    function oll(i) { return rex('oll', i, /^\d+\.[\t ]+[^\n\r]*[\n\r]/); }
+    function ull(i) { return rex('oll', i, /^[-*][\t ]+[^\n\r]*[\n\r]/); }
+    function pl(i) { return rex('pl', i, /^[^\n\r]+[\n\r]/); }
 
-    function line(i) { return alt(null, i, ulline, olline, pline); }
-    function doc(i) { return rep('doc', i, line, 1); }
+    function bl(i) { return rex(null, i, /^[ \t]*[\n\r]/); } // blank line
+
+    function p(i) { return rep('p', i, pl, 1); }
+    function ol(i) { return rep('ol', i, oll, 1); }
+    function ul(i) { return rep('ul', i, ull, 1); }
+
+    function tag(i) { return alt(null, i, bl, ul, ol, p); }
+    function doc(i) { return rep('doc', i, tag, 1); }
 
     var root = doc;
 
     // rewrite
 
-    function rewrite_line(t) {
-clog(t);
-      return t;
-    };
+    function rewriteChildren(t) {
+      return t.children
+        .map(rewrite)
+        .filter(function(r) { return r !== null; })
+    }
 
-    function rewrite_doc(t) {
-clog(t);
-      return t;
-    };
+    function rewrite_pl(t) { return t.string().trim(); }
+
+    function rewrite_ull(t) {
+      var s = t.string(); var i = Math.max(s.indexOf(' '), s.indexOf('	'));
+      return s.slice(i).trim();
+    }
+    var rewrite_oll = rewrite_ull;
+
+    function rewrite_p(t) { return [ 'p', rewriteChildren(t) ]; }
+    function rewrite_ul(t) { return [ 'ul', rewriteChildren(t) ]; }
+    function rewrite_ol(t) { return [ 'ol', rewriteChildren(t) ]; }
+
+    function rewrite_doc(t) { return [ 'doc', rewriteChildren(t) ]; }
   });
 
   //

@@ -38,11 +38,16 @@
       };
       var s =
         'This is our test\n' +
+        'It stinks.\n' +
         '\n' +
-        'This is another paragraph\n';
+        'This is another paragraph\n' +
+        '\n' +
+        '* Oh rage\n' +
+        '- Oh despair\n';
       print(s);
       var o = SaintMarc.parse(s);
       print(o);
+      clog(o);
       print('.');
     </script>
 
