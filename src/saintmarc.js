@@ -32,7 +32,11 @@ var SaintMarc = (function() {
 
   var Parser = Jaabro.makeParser(function() {
 
+    //
     // parse
+
+    //function lfcr(i) { return rex(null, i, /^[\n\r]/); }
+    //function il(i) { return alt(null, i, bold, under, italic, link, plain); }
 
     function oll(i) { return rex('oll', i, /^\d+\.[\t ]+[^\n\r]*[\n\r]/); }
     function ull(i) { return rex('oll', i, /^[-*][\t ]+[^\n\r]*[\n\r]/); }
@@ -40,15 +44,17 @@ var SaintMarc = (function() {
 
     function bl(i) { return rex(null, i, /^[ \t]*[\n\r]/); } // blank line
 
+    function hr(i) { return rex('hr', i, /^(---|\*\*\*|___)[\n\r]/); }
     function p(i) { return rep('p', i, pl, 1); }
     function ol(i) { return rep('ol', i, oll, 1); }
     function ul(i) { return rep('ul', i, ull, 1); }
 
-    function tag(i) { return alt(null, i, bl, ul, ol, p); }
+    function tag(i) { return alt(null, i, bl, ul, ol, hr, p); }
     function doc(i) { return rep('doc', i, tag, 1); }
 
     var root = doc;
 
+    //
     // rewrite
 
     function rewriteChildren(t) {
@@ -56,6 +62,8 @@ var SaintMarc = (function() {
         .map(rewrite)
         .filter(function(r) { return r !== null; })
     }
+
+    function rewrite_hr(t) { return [ 'hr' ]; }
 
     function rewrite_pl(t) { return t.string().trim(); }
 
