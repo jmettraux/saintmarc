@@ -41,6 +41,27 @@ describe 'SaintMarc' do
     end
 
     it 'ignores raw HTML'
+
+    context 'with inlines' do
+
+      {
+
+        '*emphasis*' => [ 'em', [ 'emphasis' ] ],
+        '_emphasis_' => [ 'em', [ 'emphasis' ] ],
+        '**strong**' => [ 'strong', [ 'strong' ] ],
+        '__strong__' => [ 'strong', [ 'strong' ] ],
+        '~~strikethrough~~' => [ 'del', [ 'strikethrough' ] ],
+
+      }.each do |k, v|
+
+        it "reads #{k.inspect} as #{v.inspect}" do
+
+          d = js "return SaintMarc.parse(#{k.inspect});"
+
+          expect(d[1][0][1][0]).to eq([ v ])
+        end
+      end
+    end
   end
 end
 

@@ -62,7 +62,7 @@ var SaintMarc = (function() {
     function il(i) { return alt(null, i, strong, em, del, link, plain); }
       // InLine
 
-    function pl(i) { return seq('pl', i, il, '+', lfcr); }
+    function pl(i) { return seq('pl', i, il, '+', lfcr, '?'); }
 
     function oll(i) { return rex('oll', i, /^\d+\.[\t ]+[^\n\r]*[\n\r]/); }
     function ull(i) { return rex('oll', i, /^[-*][\t ]+[^\n\r]*[\n\r]/); }
