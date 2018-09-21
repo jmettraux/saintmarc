@@ -29,7 +29,14 @@ describe 'SaintMarc' do
           '\n' +
           'This is another paragraph\n');
       }).to eq(
-        []
+        [ 'doc', [
+          [ 'p', [
+            [ 'This is our test' ]
+          ] ],
+          [ 'p', [
+            [ 'This is another paragraph' ]
+          ] ]
+        ] ]
       )
     end
 

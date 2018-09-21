@@ -30,17 +30,42 @@ var SaintMarc = (function() {
 
   this.VERSION = '0.9.0';
 
+  // the parser itself
+
   var Parser = Jaabro.makeParser(function() {
 
     //
     // parse
 
-    //function lfcr(i) { return rex(null, i, /^[\n\r]/); }
-    //function il(i) { return alt(null, i, bold, under, italic, link, plain); }
+    function lfcr(i) { return rex(null, i, /^[\n\r]/); }
+
+    function doubleu(i) { return str(null, i, '__'); }
+    function u(i) { return str(null, i, '_'); }
+    function doublea(i) { return str(null, i, '**'); }
+    function a(i) { return str(null, i, '*'); }
+    function doublet(i) { return str(null, i, '~~'); }
+
+    function plain(i) { return rex('plain', i, /[^\r\n*_~]+/); }
+
+    function link(i) { return rex('link', i, /^\[[^\]]+\]\([^)]+\)/); }
+
+    function del(i) { return seq('del', i, doublet, il, '+', doublet); }
+
+    function uem(i) { return seq(null, i, u, il, '+', u); }
+    function aem(i) { return seq(null, i, a, il, '+', a); }
+    function em(i) { return alt('em', i, aem, uem); }
+
+    function ustrong(i) { return seq(null, i, doubleu, il, '+', doubleu); }
+    function astrong(i) { return seq(null, i, doublea, il, '+', doublea); }
+    function strong(i) { return alt('strong', i, astrong, ustrong); }
+
+    function il(i) { return alt(null, i, strong, em, del, link, plain); }
+      // InLine
+
+    function pl(i) { return seq('pl', i, il, '+', lfcr); }
 
     function oll(i) { return rex('oll', i, /^\d+\.[\t ]+[^\n\r]*[\n\r]/); }
     function ull(i) { return rex('oll', i, /^[-*][\t ]+[^\n\r]*[\n\r]/); }
-    function pl(i) { return rex('pl', i, /^[^\n\r]+[\n\r]/); }
 
     function bl(i) { return rex(null, i, /^[ \t]*[\n\r]/); } // blank line
 
@@ -57,15 +82,18 @@ var SaintMarc = (function() {
     //
     // rewrite
 
-    function rewriteChildren(t) {
-      return t.children
-        .map(rewrite)
-        .filter(function(r) { return r !== null; })
-    }
+    function rwcn(t) { return t.subgather(null).map(rewrite); }
+      // gather named children and rewrite them
+
+    function rewrite_plain(t) { return t.string(); }
+
+    function rewrite_em(t) { return [ 'em', rwcn(t) ]; }
+    function rewrite_del(t) { return [ 'del', rwcn(t) ]; }
+    function rewrite_strong(t) { return [ 'strong', rwcn(t) ]; }
 
     function rewrite_hr(t) { return [ 'hr' ]; }
 
-    function rewrite_pl(t) { return t.string().trim(); }
+    var rewrite_pl = rwcn;
 
     function rewrite_ull(t) {
       var s = t.string(); var i = Math.max(s.indexOf(' '), s.indexOf('	'));
@@ -73,11 +101,11 @@ var SaintMarc = (function() {
     }
     var rewrite_oll = rewrite_ull;
 
-    function rewrite_p(t) { return [ 'p', rewriteChildren(t) ]; }
-    function rewrite_ul(t) { return [ 'ul', rewriteChildren(t) ]; }
-    function rewrite_ol(t) { return [ 'ol', rewriteChildren(t) ]; }
+    function rewrite_p(t) { return [ 'p', rwcn(t) ]; }
+    function rewrite_ul(t) { return [ 'ul', rwcn(t) ]; }
+    function rewrite_ol(t) { return [ 'ol', rwcn(t) ]; }
 
-    function rewrite_doc(t) { return [ 'doc', rewriteChildren(t) ]; }
+    function rewrite_doc(t) { return [ 'doc', rwcn(t) ]; }
   });
 
   //
