@@ -14,11 +14,8 @@ module Helpers
   def js(s)
 
     File.open('spec/source.js', 'wb') do |f|
-      f.puts(
-        (File.read('spec/jaabro.js') rescue nil) ||
-        File.read('../jaabro/src/jaabro.js'))
-      f.puts(
-        File.read('src/saintmarc.js'))
+      f.puts(File.read('spec/jaabro.js'))
+      f.puts(File.read('src/saintmarc.js'))
     end
 
     ExecJS
