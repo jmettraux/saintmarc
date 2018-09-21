@@ -51,6 +51,7 @@ describe 'SaintMarc' do
         '**strong**' => [ 'strong', [ 'strong' ] ],
         '__strong__' => [ 'strong', [ 'strong' ] ],
         '~~strikethrough~~' => [ 'del', [ 'strikethrough' ] ],
+        '[here](http://x.com/here)' => [ 'a', [ 'here', 'http://x.com/here' ] ],
 
       }.each do |k, v|
 
