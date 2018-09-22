@@ -22,7 +22,7 @@
 // Made in Japan
 
 
-var Jaabro = { VERSION: '1.1.1' }; // a44b5e2e189002c82ffd2d9fc12dfec59c404463
+var Jaabro = { VERSION: '1.1.1' };
 
 //
 // Jaabro.Input
@@ -38,15 +38,15 @@ Jaabro.Input.slice = function(offset, length) {
 
 Jaabro.Input.match = function(str_or_rex) {
 
+//console.log([ this.offset, '///', arguments[1], str_or_rex ]);
   if ((typeof str_or_rex) === 'string') {
     var l = str_or_rex.length;
+//console.log([ this.slice(this.offset, 80) + '<<<', this.slice(this.offset, l) === str_or_rex ? l : -1 ]);
     return this.slice(this.offset, l) === str_or_rex ? l : -1;
   }
 
-//clog(this.slice(this.offset));
-//clog(JSON.stringify(this.slice(this.offset)));
-//clog(str_or_rex);
   var m = this.slice(this.offset).match(str_or_rex);
+//console.log([ this.slice(this.offset, 80) + '<<<', (m !== null && m.index == 0 ? m[0].length : -1) ]);
   return m !== null && m.index == 0 ? m[0].length : -1;
 };
 
@@ -57,10 +57,7 @@ Jaabro.Tree = {};
 
 Jaabro.Tree.prune = function() {
 
-  var cn = []; this.children.forEach(function(c) {
-    if (c.result === 1) cn.push(c);
-  });
-  this.children = cn;
+  this.children = this.children.filter(function(c) { return c.result === 1; });
 };
 
 Jaabro.Tree.string = function() {
@@ -158,6 +155,51 @@ Jaabro.Tree.toString = function() {
   return depth == 0 ? string.join('') : null;
 };
 
+Jaabro.Tree._eCreate = function(parentElt, tag, atts, text) {
+
+  var e = document.createElement(tag);
+  for (var k in (atts || {})) { e.setAttribute(k, atts[k]); }
+  e.textContent = text || '';
+
+  if (parentElt) parentElt.appendChild(e);
+
+  return e;
+};
+
+Jaabro.Tree._dlSet = function(dl, key, value, atts) {
+
+  atts = atts || {};
+  atts['class'] = (atts['class'] || '') + ' ' + key;
+  var di = this._eCreate(dl, 'div', atts);
+
+  var dt = this._eCreate(di, 'dt', {}, key);
+  var dd = this._eCreate(di, 'dd', {}, '');
+
+  var t = typeof value; if (value === null) t = 'null';
+  if (Array.isArray(value)) value.forEach(function(e) { dd.appendChild(e); });
+  else if (t === 'object' && ('onmouseleave' in value)) dd.appendChild(value);
+  else if ('string|number|boolean'.indexOf(t) > -1) dd.textContent = '' + value;
+
+  return di;
+};
+
+Jaabro.Tree.toHtml = function() {
+
+  var dl = this._eCreate(
+    null, 'dl', { 'class': this.result === 1 ? 'success' : 'failure' });
+
+  this._dlSet(
+    dl, 'name', this.name === null ? '(null)' : '"' + this.name + '"');
+  this._dlSet(
+    dl, 'offset', this.offset);
+  this._dlSet(
+    dl, 'string', JSON.stringify(this.string()));
+  if (this.children.length > 0) this._dlSet(
+    dl, '', this.children.map(function(c) { return c.toHtml(); }));
+
+  return dl;
+};
+
 //
 // Jaabro
 
@@ -166,7 +208,7 @@ Jaabro.str = function(name, input, str) {
   var r =
     this.makeTree(name, input, (typeof str) === 'string' ? 'str' : 'rex');
 
-  var l = input.match(str);
+  var l = input.match(str, name);
   if (l > -1) {
     r.result = 1;
     r.length = l;
@@ -481,7 +523,7 @@ Jaabro.parse = function(string, opts) {
 
   opts = opts || {};
 
-  d = parseInt(opts.debug, 10) || 0
+  d = parseInt(opts.debug, 10) || 0;
   if (d > 0) opts.rewrite = false;
   if (d > 1) opts.all = false;
   if (d > 2) opts.prune = false;
@@ -492,7 +534,7 @@ Jaabro.parse = function(string, opts) {
   if (opts.all === false) t = this.root(this.makeInput(string, opts));
   else t = Jaabro.all(null, this.makeInput(string, opts), this.root);
 
-  if (opts.prune != false && t.result !== 1) return null;
+  if (opts.prune !== false && t.result !== 1) return null;
 
   if (t.parter === 'all') t = t.children[0];
 

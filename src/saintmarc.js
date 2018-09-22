@@ -37,15 +37,17 @@ var SaintMarc = (function() {
     //
     // parse
 
-    function lfcr(i) { return rex(null, i, /^[\n\r]/); }
+    //function lfcr(i) { return rex(null, i, /^[\n\r]/); }
+    function eol(i) { return rex(null, i, /[\n\r]|$/); }
 
     function doubleu(i) { return str(null, i, '__'); }
-    function u(i) { return str(null, i, '_'); }
     function doublea(i) { return str(null, i, '**'); }
-    function a(i) { return str(null, i, '*'); }
     function doublet(i) { return str(null, i, '~~'); }
+    function u(i) { return str(null, i, '_'); }
+    //function a(i) { return str(null, i, '*'); }
 
-    function plain(i) { return rex('plain', i, /[^\r\n*_~\[\]()]+/); }
+    //function plain(i) { return rex('plain', i, /[^\r\n*_~\[\]()]+/); }
+    function plain(i) { return rex('plain', i, /[^\r\n*_~\[\]()]+|[^\n\r]/); }
 
     function startb(i) { return str(null, i, '['); }
     function endb(i) { return str(null, i, ']'); }
@@ -60,8 +62,9 @@ var SaintMarc = (function() {
     function del(i) { return seq('del', i, doublet, il, '+', doublet); }
 
     function uem(i) { return seq(null, i, u, il, '+', u); }
-    function aem(i) { return seq(null, i, a, il, '+', a); }
-    function em(i) { return alt('em', i, aem, uem); }
+    //function aem(i) { return seq(null, i, a, il, '+', a); }
+    //function em(i) { return alt('em', i, aem, uem); }
+    function em(i) { return alt('em', i, uem); }
 
     function ustrong(i) { return seq(null, i, doubleu, il, '+', doubleu); }
     function astrong(i) { return seq(null, i, doublea, il, '+', doublea); }
@@ -70,10 +73,12 @@ var SaintMarc = (function() {
     function il(i) { return alt(null, i, strong, em, del, link, plain); }
       // InLine
 
-    function pl(i) { return seq('pl', i, il, '+', lfcr, '?'); }
+    function pl(i) { return seq('pl', i, il, '+', eol); }
 
     function oll(i) { return rex('oll', i, /^\d+\.[\t ]+[^\n\r]*[\n\r]/); }
+      // FIXME
     function ull(i) { return rex('oll', i, /^[-*][\t ]+[^\n\r]*[\n\r]/); }
+      // FIXME
 
     function bl(i) { return rex(null, i, /^[ \t]*[\n\r]/); } // blank line
 
@@ -127,11 +132,11 @@ var SaintMarc = (function() {
   //
   // public methods
 
-  this.parse = function(s) {
+  this.parse = function(s, opts) {
 
     if (typeof s !== 'string') return null;
 
-    return Parser.parse(s);
+    return Parser.parse(s, opts);
   };
 
   //

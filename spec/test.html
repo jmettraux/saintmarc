@@ -11,13 +11,37 @@
 
     <!--script src="helpers.js"></script-->
 
+    <!--link
+      rel="stylesheet"
+      href="https://meyerweb.com/eric/tools/css/reset/reset.css"
+      type="text/css" /-->
     <style>
       pre {
         border: 1px solid black;
-        height: 42em;
+        height: 14em;
         padding: 3px;
         white-space: pre-wrap;
         word-break: break-word;
+      }
+      #tree {
+        font-size: 50%;
+      }
+      dl {
+      }
+      dl.success {
+        border-left: 3px solid lightgreen;
+      }
+      dl.failure {
+        border-left: 3px solid red;
+      }
+      dl > div {
+      }
+      dt {
+        display: inline-block;
+        padding-left: 0.35em;
+      }
+      dd {
+        display: inline-block;
       }
     </style>
   </head>
@@ -27,36 +51,41 @@
     <h1>saintmarc</h1>
 
     <pre id="out"></pre>
+    <div id="tree"></div>
 
     <script>
+
       var clog = console.log;
-      var print = function(o) {
-        var pre = H.elt('#out');
-        //var t = JSON.stringify(o);
-        var t = (typeof o === 'string') ? o : JSON.stringify(o);
-        pre.textContent = pre.textContent + t + "\n";
-      };
+
       var s =
-        'This is our test\n' +
-        'It stinks.\n' +
-        '\n' +
-        'This is another paragraph\n' +
-        '\n' +
-        '---\n' +
-        '\n' +
-        '**strong**\n' +
-        '*emphasis*\n' +
-        '~~strikethrough~~\n' +
-        'click [here](http://example.com/link)!\n' +
-        'this is ~~striken through~~, *gosh*\n' +
-        '\n' +
-        '* Oh rage\n' +
-        '- Oh despair\n';
-      print(s);
+        //'This is our test\n' +
+        //'It stinks.\n' +
+        //'\n' +
+        //'This is another paragraph\n' +
+        //'\n' +
+        //'---\n' +
+        //'\n' +
+        //'**strong**\n' +
+        //'__strong2__\n' +
+        //'_emphasis_\n' +
+        //'~~strikethrough~~\n' +
+        //'click [here](http://example.com/link)!\n' +
+        //'this is ~~striken through~~, _gosh_\n' +
+        //'\n' +
+        //'* Oh rage\n' +
+        //'- Oh despair\n' +
+        //'\n' +
+        '**multiplication** 1 * 2 * 3\n'
+      //var o = SaintMarc.parse(s);
+
+      var t = SaintMarc.parse(s, { debug: 3 });
+      clog(t);
+
+      H.remove('#tree > dl');
+      H.elt('#tree').appendChild(t.toHtml());
+
       var o = SaintMarc.parse(s);
-      print(o);
-      clog(o);
-      print('.');
+      H.elt('#out').textContent = JSON.stringify(o);
     </script>
 
   </body>

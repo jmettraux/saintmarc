@@ -46,12 +46,15 @@ describe 'SaintMarc' do
 
       {
 
-        '*emphasis*' => [ 'em', [ 'emphasis' ] ],
+        #'*emphasis*' => [ 'em', [ 'emphasis' ] ],
         '_emphasis_' => [ 'em', [ 'emphasis' ] ],
         '**strong**' => [ 'strong', [ 'strong' ] ],
         '__strong__' => [ 'strong', [ 'strong' ] ],
         '~~strikethrough~~' => [ 'del', [ 'strikethrough' ] ],
         '[here](http://x.com/here)' => [ 'a', [ 'here', 'http://x.com/here' ] ],
+
+        '**multiplication** 1 * 3' =>
+          [],
 
       }.each do |k, v|
 
