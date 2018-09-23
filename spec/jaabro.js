@@ -155,7 +155,7 @@ Jaabro.Tree.toString = function() {
   return depth == 0 ? string.join('') : null;
 };
 
-Jaabro.Tree._eCreate = function(parentElt, tag, atts, text) {
+Jaabro.Tree._c = function(parentElt, tag, atts, text) {
 
   var ss = tag.split('.'); tag = ss.shift();
 
@@ -169,57 +169,64 @@ Jaabro.Tree._eCreate = function(parentElt, tag, atts, text) {
   return e;
 };
 
-Jaabro.Tree._dlSet = function(dl, key, value, atts) {
+Jaabro.Tree._s = function(dl, key, value, atts) {
 
-  var di = this._eCreate(dl, 'div.jaabro-' + key, atts);
+  var di = this._c(dl, 'div.jaabro-' + key, atts);
 
-  var dt = this._eCreate(di, 'dt', {}, key);
-  var dd = this._eCreate(di, 'dd', {}, value);
+  var dt = this._c(di, 'dt', {}, key);
+  var dd = this._c(di, 'dd', {}, value);
 
   return di;
 };
 
 Jaabro.Tree.toHtml = function(parentElement) {
 
-  var div = this._eCreate(
+  var div = this._c(
     parentElement,
     'div.jaabro-tree.jaabro-' + (this.result === 1 ? 'success' : 'failure'));
 
-  var su = this._eCreate(div, 'div.jaabro-summary');
-  var co = this._eCreate(div, 'div.jaabro-complete');
+  var su = this._c(div, 'div.jaabro-summary');
+  var co = this._c(div, 'div.jaabro-complete');
 
   var noname = this.name === null;
   var n = noname ? '(null)' : this.name;
 
+  var s = this.string();
   var t = this.input.slice(this.offset, 80);
   if (t.length === 80) t = t + '&hellip';
+
+  var f = this.parser.toString().replace('return Jaabro.', '');
+  var fn = f.match(/^function ([^(]+)/)[1];
 
   // summary
 
   var xn = noname ? '.jaabro-no-name' : '';
-  this._eCreate(su, 'span.jaabro-name' + xn, {}, n);
-  this._eCreate(su, 'span.jaabro-offset', {}, '' + this.offset);
-  this._eCreate(su, 'span.jaabro-length', {}, '' + this.length);
-  this._eCreate(su, 'span.jaabro-string', {}, JSON.stringify(this.string()));
-  this._eCreate(su, 'span.jaabro-at', {}, JSON.stringify(t));
-  this._eCreate(su, 'span.jaabro-ccount', {}, '' + this.children.length);
+  this._c(su, 'span.jaabro-name' + xn, {}, n);
+  if (n !== fn) this._c(su, 'span.jaabro-parser', {}, fn + '()');
+  this._c(su, 'span.jaabro-offset', {}, '' + this.offset);
+  this._c(su, 'span.jaabro-length', {}, '' + this.length);
+  var ma = this._c(su, 'span.jaabro-match');
+  this._c(ma, 'span.jaabro-dquote', {}, '"');
+  this._c(ma, 'span.jaabro-string', {}, s);
+  this._c(ma, 'span.jaabro-post-string', {}, t.slice(s.length));
+  this._c(ma, 'span.jaabro-dquote', {}, '"');
+  //this._c(su, 'span.jaabro-at', {}, JSON.stringify(t));
+  //this._c(su, 'span.jaabro-ccount', {}, '' + this.children.length);
 
   // complete
 
-  var dl = this._eCreate(co, 'dl.jaabro-attributes');
+  var dl = this._c(co, 'dl.jaabro-attributes');
 
-  this._dlSet(dl, 'name', n);
-  if (this.parser) { this._dlSet(
-    dl, 'parser', this.parser.toString().replace('return Jaabro.', '')); }
-  this._dlSet(dl, 'offset', '' + this.offset);
-  this._dlSet(dl, 'length', '' + this.length);
-  this._dlSet(dl, 'string', JSON.stringify(this.string()));
-  this._dlSet(dl, 'at', JSON.stringify(t));
+  this._s(dl, 'name', n);
+  if (this.parser) this._s(dl, 'parser', f);
+  this._s(dl, 'off, len', '' + this.offset + ', ' + this.length);
+  this._s(dl, 'string', JSON.stringify(s));
+  this._s(dl, 'at', JSON.stringify(t));
 
   // children
 
   if (this.children.length > 0) {
-    var cn = this._eCreate(div, 'div.jaabro-children');
+    var cn = this._c(div, 'div.jaabro-children');
     this.children.forEach(function(c) { c.toHtml(cn); });
   }
 
