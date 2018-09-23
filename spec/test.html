@@ -45,6 +45,16 @@
         margin-inline-start: 1.4em;
         display: inline-block;
       }
+      .jaabro-summary {
+        cursor: pointer;
+      }
+      .jaabro-summary > span {
+        padding-left: 0.35em;
+      }
+      /*.jaabro-summary > .jaabro-at { display: none; }*/
+      .jaabro-summary > .jaabro-name:not(.jaabro-no-name) {
+        font-weight: bold;
+      }
     </style>
   </head>
 
@@ -63,10 +73,17 @@
       var clog = console.log;
 
       var elt = function(sel) { return document.querySelector(sel); };
+      var elts = function(sel) { return document.querySelectorAll(sel); };
+
       var removeAll = function(sel) {
-        document
-          .querySelectorAll(sel)
+        elts(sel)
           .forEach(function(e) { e.parentElement.removeChild(e); });
+        return undefined;
+      };
+
+      var on = function(sel, evName, evHandler) {
+        elts(sel)
+          .forEach(function(e) { e.addEventListener(evName, evHandler); });
         return undefined;
       };
 
@@ -104,6 +121,20 @@
 
       var o = SaintMarc.parse(s);
       elt('#out').textContent = JSON.stringify(o);
+
+      elts('.jaabro-complete')
+        .forEach(function(e) { e.style.display = 'none'; });
+
+      on('.jaabro-summary', 'click', function(ev) {
+        var div = ev.target.closest('.jaabro-tree');
+        div.querySelector('.jaabro-summary').style.display = 'none';
+        div.querySelector('.jaabro-complete').style.display = null;
+      });
+      on('.jaabro-complete', 'click', function(ev) {
+        var div = ev.target.closest('.jaabro-tree');
+        div.querySelector('.jaabro-summary').style.display = null;
+        div.querySelector('.jaabro-complete').style.display = 'none';
+      });
     </script>
 
   </body>

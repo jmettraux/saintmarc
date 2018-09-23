@@ -185,25 +185,45 @@ Jaabro.Tree.toHtml = function(parentElement) {
     parentElement,
     'div.jaabro-tree.jaabro-' + (this.result === 1 ? 'success' : 'failure'));
 
-  var dl = this._eCreate(div, 'dl.jaabro-attributes');
+  var su = this._eCreate(div, 'div.jaabro-summary');
+  var co = this._eCreate(div, 'div.jaabro-complete');
 
-  this._dlSet(dl, 'name', this.name === null ? '(null)' : '"' + this.name + '"');
-  if (this.parser) {
-    this._dlSet(
-      dl, 'parser', this.parser.toString().replace('return Jaabro.', ''));
-  }
-  this._dlSet(dl, 'offset', '' + this.offset);
-  this._dlSet(dl, 'length', '' + this.length);
-  this._dlSet(dl, 'string', JSON.stringify(this.string()));
+  var noname = this.name === null;
+  var n = noname ? '(null)' : this.name;
 
   var t = this.input.slice(this.offset, 80);
   if (t.length === 80) t = t + '&hellip';
+
+  // summary
+
+  var xn = noname ? '.jaabro-no-name' : '';
+  this._eCreate(su, 'span.jaabro-name' + xn, {}, n);
+  this._eCreate(su, 'span.jaabro-offset', {}, '' + this.offset);
+  this._eCreate(su, 'span.jaabro-length', {}, '' + this.length);
+  this._eCreate(su, 'span.jaabro-string', {}, JSON.stringify(this.string()));
+  this._eCreate(su, 'span.jaabro-at', {}, JSON.stringify(t));
+  this._eCreate(su, 'span.jaabro-ccount', {}, '' + this.children.length);
+
+  // complete
+
+  var dl = this._eCreate(co, 'dl.jaabro-attributes');
+
+  this._dlSet(dl, 'name', n);
+  if (this.parser) { this._dlSet(
+    dl, 'parser', this.parser.toString().replace('return Jaabro.', '')); }
+  this._dlSet(dl, 'offset', '' + this.offset);
+  this._dlSet(dl, 'length', '' + this.length);
+  this._dlSet(dl, 'string', JSON.stringify(this.string()));
   this._dlSet(dl, 'at', JSON.stringify(t));
+
+  // children
 
   if (this.children.length > 0) {
     var cn = this._eCreate(div, 'div.jaabro-children');
     this.children.forEach(function(c) { c.toHtml(cn); });
   }
+
+  // over
 
   return div;
 };
