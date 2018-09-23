@@ -4,11 +4,8 @@
   <head>
     <title>test</title>
 
-    <script src="../../h.js/src/h.js"></script>
     <script src="jaabro.js"></script>
-
     <script src="../src/saintmarc.js"></script>
-
     <!--script src="helpers.js"></script-->
 
     <!--link
@@ -65,6 +62,14 @@
 
       var clog = console.log;
 
+      var elt = function(sel) { return document.querySelector(sel); };
+      var removeAll = function(sel) {
+        document
+          .querySelectorAll(sel)
+          .forEach(function(e) { e.parentElement.removeChild(e); });
+        return undefined;
+      };
+
       var s =
         //'This is our test\n' +
         //'It stinks.\n' +
@@ -88,16 +93,17 @@
 
       var t = SaintMarc.parse(s, { debug: 1 });
       clog(t);
-      H.remove('#tree > div');
-      H.elt('#tree').appendChild(t.toHtml());
+      clog(document.querySelectorAll('#tree > div'));
+      removeAll('#tree > div');
+      elt('#tree').appendChild(t.toHtml());
 
       var t = SaintMarc.parse(s, { debug: 3 });
       clog(t);
-      H.remove('#debug-tree > div');
-      H.elt('#debug-tree').appendChild(t.toHtml());
+      removeAll('#debug-tree > div');
+      elt('#debug-tree').appendChild(t.toHtml());
 
       var o = SaintMarc.parse(s);
-      H.elt('#out').textContent = JSON.stringify(o);
+      elt('#out').textContent = JSON.stringify(o);
     </script>
 
   </body>
