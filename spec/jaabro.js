@@ -169,16 +169,6 @@ Jaabro.Tree._c = function(parentElt, tag, atts, text) {
   return e;
 };
 
-Jaabro.Tree._s = function(dl, key, value, atts) {
-
-  var di = this._c(dl, 'div.jaabro-' + key, atts);
-
-  var dt = this._c(di, 'dt', {}, key);
-  var dd = this._c(di, 'dd', {}, value);
-
-  return di;
-};
-
 Jaabro.Tree.toHtml = function(parentElement) {
 
   var div = this._c(
@@ -186,7 +176,7 @@ Jaabro.Tree.toHtml = function(parentElement) {
     'div.jaabro-tree.jaabro-' + (this.result === 1 ? 'success' : 'failure'));
 
   var su = this._c(div, 'div.jaabro-summary');
-  var co = this._c(div, 'div.jaabro-complete');
+  var ex = this._c(div, 'div.jaabro-extra');
 
   var noname = this.name === null;
   var n = noname ? '(null)' : this.name;
@@ -198,30 +188,27 @@ Jaabro.Tree.toHtml = function(parentElement) {
   var f = this.parser.toString().replace('return Jaabro.', '');
   var fn = f.match(/^function ([^(]+)/)[1];
 
+  var cn = this.children.length;
+  var fcn = this.children.filter(function(c) { return c.result === 0; }).length;
+
   // summary
 
   var xn = noname ? '.jaabro-no-name' : '';
   this._c(su, 'span.jaabro-name' + xn, {}, n);
   if (n !== fn) this._c(su, 'span.jaabro-parser', {}, fn + '()');
-  this._c(su, 'span.jaabro-offset', {}, '' + this.offset);
-  this._c(su, 'span.jaabro-length', {}, '' + this.length);
+  this._c(su, 'span.jaabro-offlen', {}, '[' + this.offset + ',' + this.length + ']');
+  var cl = this._c(su, 'span.jaabro-children-count');
+  this._c(cl, 'span.jaabro-total-children-count', {}, 'cn' + cn);
+  this._c(cl, 'span.jaabro-failed-children-count', {}, 'fcn' + fcn);
   var ma = this._c(su, 'span.jaabro-match');
   this._c(ma, 'span.jaabro-dquote', {}, '"');
   this._c(ma, 'span.jaabro-string', {}, s);
   this._c(ma, 'span.jaabro-post-string', {}, t.slice(s.length));
   this._c(ma, 'span.jaabro-dquote', {}, '"');
-  //this._c(su, 'span.jaabro-at', {}, JSON.stringify(t));
-  //this._c(su, 'span.jaabro-ccount', {}, '' + this.children.length);
 
-  // complete
+  // extra
 
-  var dl = this._c(co, 'dl.jaabro-attributes');
-
-  this._s(dl, 'name', n);
-  if (this.parser) this._s(dl, 'parser', f);
-  this._s(dl, 'off, len', '' + this.offset + ', ' + this.length);
-  this._s(dl, 'string', JSON.stringify(s));
-  this._s(dl, 'at', JSON.stringify(t));
+  this._c(ex, 'span.jaabro-parser', {}, f);
 
   // children
 
