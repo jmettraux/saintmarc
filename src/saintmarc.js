@@ -120,8 +120,11 @@ var SaintMarc = (function() {
     };
 
     function rewrite_p(t) { return [ 'p', flatten(rwcn(t)) ]; }
-    function rewrite_ul(t) { return [ 'ul', flatten(rwcn(t)) ]; }
-    function rewrite_ol(t) { return [ 'ol', flatten(rwcn(t)) ]; }
+
+    function rewrite_ul(t) {
+      return [ 'ul', rwcn(t).map(function(c) { return [ 'li', c ]; }) ]; }
+    function rewrite_ol(t) {
+      return [ 'ol', rwcn(t).map(function(c) { return [ 'li', c ]; }) ]; }
 
     function rewrite_doc(t) { return [ 'doc', rwcn(t) ]; }
   });
@@ -172,15 +175,18 @@ var SaintMarc = (function() {
   var makeListRenderer = function(tag) {
     return function(t, opts) {
       var e = _c(opts.parent, tag + '.-' + tag);
-      t[1].forEach(function(c) {
-        var ei = _c(e, 'li.-li'); render(c, _no(opts, ei));
-      });
+      t[1].forEach(function(c) { render(c, _no(opts, e)); });
       return e;
     };
   }
   r.ul = makeListRenderer('ul');
   r.ol = makeListRenderer('ol');
 
+  r.li = function(t, opts) {
+    var e = _c(opts.parent, 'li.-li');
+    t[1].forEach(function(c) { render(c, _no(opts, e)); });
+    return e;
+  };
 
   var render = function(t, opts) {
     opts = opts || {};

@@ -87,11 +87,11 @@ Counting to 3:
 0. and **four**.
     </textarea>
 
-    <h2>out:</h2>
-    <pre id="out"></pre>
-
     <h2>tree:</h2>
-    <div id="tree"></div>
+    <pre id="tree"></pre>
+
+    <h2>out:</h2>
+    <div id="out"></div>
 
     <h2>parse tree:</h2>
     <div id="parse-tree"></div>
@@ -137,17 +137,17 @@ Counting to 3:
 
         var s = elt('#in').value.trim();
 
-        // #out
-        //
-        var t = SaintMarc.parse(s);
-        elt('#out').textContent = toPre(0, t, '');
-
         // #tree
         //
+        var t = SaintMarc.parse(s);
+        elt('#tree').textContent = toPre(0, t, '');
+
+        // #out
+        //
         var e = SaintMarc.toHtml(s);
-        clog(e);
-        removeAll('#tree > *');
-        elt('#tree').appendChild(e);
+        //clog(e);
+        removeAll('#out > *');
+        elt('#out').appendChild(e);
 
         // #parse-tree
         //
