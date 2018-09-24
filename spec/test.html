@@ -42,7 +42,10 @@
       .jaabro-failure {
         border-left: 2px solid red;
       }
-      .jaabro-summary {
+      .jaabro-name {
+        cursor: pointer;
+      }
+      .jaabro-children-count {
         cursor: pointer;
       }
       .jaabro-summary > span {
@@ -116,9 +119,14 @@
         //'- Oh despair\n' +
         //'\n' +
         '**multiplication** 1 * 2 * 3\n'
-      //var o = SaintMarc.parse(s);
+
+      // #out
+      //
+      var o = SaintMarc.parse(s);
+      elt('#out').textContent = JSON.stringify(o);
 
       // #tree
+      //
       //var t = SaintMarc.parse(s, { debug: 1 });
       //clog(t);
       //clog(document.querySelectorAll('#tree > div'));
@@ -126,25 +134,28 @@
       //elt('#tree').appendChild(t.toHtml());
 
       // #debug-tree
+      //
       var t = SaintMarc.parse(s, { debug: 3 });
       clog(t);
       removeAll('#debug-tree > div');
       elt('#debug-tree').appendChild(t.toHtml());
 
-      var o = SaintMarc.parse(s);
-      elt('#out').textContent = JSON.stringify(o);
+      elts('.jaabro-extra')
+        .forEach(function(e) { e.style.display = 'none'; });
+      elts('.jaabro-failure')
+        .forEach(function(e) { e.style.display = 'none'; });
 
-      elts('.jaabro-extra').forEach(function(e) { e.style.display = 'none'; });
-
-      on('.jaabro-summary', 'click', function(ev) {
+      on('.jaabro-name', 'click', function(ev) {
         var t = ev.target.closest('.jaabro-tree');
         var ex = t.querySelector('.jaabro-extra');
         ex.style.display = ex.style.display === 'none' ? null : 'none';
       });
-      on('.jaabro-extra', 'click', function(ev) {
-        var div = ev.target.closest('.jaabro-tree');
-        //div.querySelector('.jaabro-summary').style.display = null;
-        div.querySelector('.jaabro-extra').style.display = 'none';
+
+      on('.jaabro-children-count', 'click', function(ev) {
+        var t = ev.target.closest('.jaabro-tree');
+        var fs = t.querySelectorAll(':scope > .jaabro-children > .jaabro-failure');
+        var d = (fs[0] && fs[0].style.display === 'none') ? null : 'none';
+        fs.forEach(function(f) { f.style.display = d; });
       });
     </script>
 
