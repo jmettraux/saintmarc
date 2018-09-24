@@ -144,6 +144,7 @@
         .forEach(function(e) { e.style.display = 'none'; });
       elts('.jaabro-failure')
         .forEach(function(e) { e.style.display = 'none'; });
+      elt('#debug-tree > .jaabro-failure').style.display = null;
 
       on('.jaabro-name', 'click', function(ev) {
         var t = ev.target.closest('.jaabro-tree');
