@@ -156,16 +156,12 @@ Jaabro.Tree.toString = function() {
 };
 
 Jaabro.Tree._c = function(parentElt, tag, atts, text) {
-
-  var ss = tag.split('.'); tag = ss.shift();
-
-  var e = document.createElement(tag);
+  var ss = tag.split('.');
+  var e = document.createElement(ss.shift());
   for (var k in (atts || {})) { e.setAttribute(k, atts[k]); }
   e.className = ss.join(' ');
   e.textContent = text || '';
-
   if (parentElt) parentElt.appendChild(e);
-
   return e;
 };
 
