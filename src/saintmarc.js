@@ -47,7 +47,7 @@ var SaintMarc = (function() {
     //function a(i) { return str(null, i, '*'); }
 
     function plain(i) {
-      return rex('plain', i, /[^\r\n*_~\[\]()]+|\*[^*]|~[^~]|_[^_]/); }
+      return rex('plain', i, /(\*[^*]|_[^_]|~[^~]|[^\r\n*_~\[\]()])+/); }
 
     function startb(i) { return str(null, i, '['); }
     function endb(i) { return str(null, i, ']'); }
@@ -95,20 +95,8 @@ var SaintMarc = (function() {
     //
     // rewrite
 
-    // gather named children and rewrite them, concat strings
-    //
-    function rwcn(t, concat) {
-      var a = t.subgather(null).map(rewrite);
-      if (concat === false) return a;
-      var r = [];
-      var s = null;
-      a.forEach(function(e) {
-        if (typeof e !== 'string') { if (s) r.push(s); s = null; r.push(e); }
-        else { if ( ! s) s = ''; s = s + e; }
-      });
-      if (s) r.push(s);
-      return r;
-    }
+    // gather named children and rewrite them
+    function rwcn(t, concat) { return t.subgather(null).map(rewrite); }
 
     function rwts(t) { return t.string(); }
 
