@@ -129,30 +129,58 @@ var SaintMarc = (function() {
   //
   // protected methods
 
-  var _c = function(parentElt, tag, atts, text) {
+  var _c = function(parentElt, tag, /*atts,*/ text) {
     var ss = tag.split('.');
     var t = ss.shift(); if (t === '') t = 'div';
     var e = document.createElement(t);
-    for (var k in (atts || {})) { e.setAttribute(k, atts[k]); }
+    //for (var k in (atts || {})) { e.setAttribute(k, atts[k]); }
     e.className = ss.map(function(c) { return 'saintmarc' + c; }).join(' ');
     e.textContent = text || '';
     if (parentElt) parentElt.appendChild(e);
     return e;
   };
+  var _no = function(opts, parent) {
+    var os = {}; for (var k in opts) { os[k] = opts[k]; }
+    os.parent = parent;
+    return os;
+  };
 
   var r = {};
+
   r.doc = function(t, opts) {
     var e = _c(null, '.-doc');
-    opts.parent = e; t[1].forEach(function(c) { render(c, opts); });
+    var os = _no(opts, e); t[1].forEach(function(c) { render(c, os); });
     return e;
   };
+
   r.p = function(t, opts) {
-clog(t);
-    var e = _c(opts.parent, 'p');
-clog(t[1]);
-    opts.parent = e; t[1].forEach(function(c) { render(c, opts); });
+    var e = _c(opts.parent, 'p.-p');
+    var os = _no(opts, e); t[1].forEach(function(c) { render(c, os); });
     return e;
   };
+
+  r.span = function(t, opts) {
+    return _c(opts.parent, 'span.-span', t[1]);
+  };
+
+  r.strong = function(t, opts) {
+    var e = _c(opts.parent, 'strong.-strong');
+    var os = _no(opts, e); t[1].forEach(function(c) { render(c, os); });
+    return e;
+  };
+
+  var makeListRenderer = function(tag) {
+    return function(t, opts) {
+      var e = _c(opts.parent, tag + '.-' + tag);
+      t[1].forEach(function(c) {
+        var ei = _c(e, 'li.-li'); render(c, _no(opts, ei));
+      });
+      return e;
+    };
+  }
+  r.ul = makeListRenderer('ul');
+  r.ol = makeListRenderer('ol');
+
 
   var render = function(t, opts) {
     opts = opts || {};

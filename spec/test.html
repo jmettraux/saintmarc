@@ -13,14 +13,20 @@
       href="https://meyerweb.com/eric/tools/css/reset/reset.css"
       type="text/css" /-->
     <style>
-      pre {
-        border: 1px solid black;
+      textarea {
+        width: 100%;
         height: 14em;
+      }
+      pre {
+        font-size: 77%;
+        border: 1px solid black;
+        height: 21em;
         padding: 3px;
         white-space: pre-wrap;
         word-break: break-word;
       }
-      #tree, #debug-tree {
+
+      #parse-tree {
         font-size: 84%;
         font-family: monospace;
         width: 70em;
@@ -72,14 +78,23 @@
 
     <h1>saintmarc</h1>
 
+    <h2>in:</h2>
+    <textarea id="in">
+Counting to 3:
+
+0. one,
+0. two,
+0. and **four**.
+    </textarea>
+
     <h2>out:</h2>
     <pre id="out"></pre>
-    <!--
+
     <h2>tree:</h2>
     <div id="tree"></div>
-    -->
-    <h2>debug-tree:</h2>
-    <div id="debug-tree"></div>
+
+    <h2>parse tree:</h2>
+    <div id="parse-tree"></div>
 
     <script>
 
@@ -100,67 +115,76 @@
         return undefined;
       };
 
-      var s =
-        'this is our test\n' +
-        'it should work\n' +
-        "it'd **better** work\n" +
-        '';
-        //'This is our test\n' +
-        //'It stinks.\n' +
-        //'\n' +
-        //'This is another paragraph\n' +
-        //'\n' +
-        //'---\n' +
-        //'\n' +
-        //'**strong**\n' +
-        //'__strong2__\n' +
-        //'_emphasis_\n' +
-        //'~~strikethrough~~\n' +
-        //'click [here](http://example.com/link)!\n' +
-        //'this is ~~striken through~~, _gosh_\n' +
-        //'\n' +
-        //'* Oh rage\n' +
-        //'- Oh despair\n' +
-        //'\n' +
-        '**multiplication** 1 * 2 * 3\n' +
-        '\n' +
-        '* point **1**\n' +
-        '* point **2**\n' +
-        '\n' +
-        '';
+      var toPre = function(depth, tree, out) {
 
-      // #out
-      //
-      var o = SaintMarc.parse(s);
-      elt('#out').textContent = JSON.stringify(o);
+        var ind = ''; for (var i = 0; i < depth; i++) ind = ind + '  ';
 
-      // #debug-tree
-      //
-      var t = SaintMarc.parse(s, { debug: 3 });
-      clog(t);
-      removeAll('#debug-tree > div');
-      elt('#debug-tree').appendChild(t.toHtml());
+        out = out + ind + tree[0];
 
-      elts('.jaabro-extra')
-        .forEach(function(e) { e.style.display = 'none'; });
-      elts('.jaabro-failure')
-        .forEach(function(e) { e.style.display = 'none'; });
-      try {
-        elt('#debug-tree > .jaabro-failure').style.display = null;
-      } catch(e) {}
+        if (Array.isArray(tree[1])) {
+          tree[1]
+            .forEach(function(c) {
+              out = out + '\n'; out = toPre(depth + 1, c, out); });
+        }
+        else {
+          out = out + ' ' + JSON.stringify(tree[1]);
+        }
 
-      on('.jaabro-name', 'click', function(ev) {
-        var t = ev.target.closest('.jaabro-tree');
-        var ex = t.querySelector('.jaabro-extra');
-        ex.style.display = ex.style.display === 'none' ? null : 'none';
-      });
+        return out;
+      };
 
-      on('.jaabro-children-count', 'click', function(ev) {
-        var t = ev.target.closest('.jaabro-tree');
-        var fs = t.querySelectorAll(':scope > .jaabro-children > .jaabro-failure');
-        var d = (fs[0] && fs[0].style.display === 'none') ? null : 'none';
-        fs.forEach(function(f) { f.style.display = d; });
-      });
+      var render = function() {
+
+        var s = elt('#in').value.trim();
+
+        // #out
+        //
+        var t = SaintMarc.parse(s);
+        elt('#out').textContent = toPre(0, t, '');
+
+        // #tree
+        //
+        var e = SaintMarc.toHtml(s);
+        clog(e);
+        removeAll('#tree > *');
+        elt('#tree').appendChild(e);
+
+        // #parse-tree
+        //
+        var t = SaintMarc.parse(s, { debug: 3 });
+        //clog(t);
+        removeAll('#parse-tree > div');
+        elt('#parse-tree').appendChild(t.toHtml());
+
+        elts('.jaabro-extra')
+          .forEach(function(e) { e.style.display = 'none'; });
+        elts('.jaabro-failure')
+          .forEach(function(e) { e.style.display = 'none'; });
+        try {
+          elt('#parse-tree > .jaabro-failure').style.display = null;
+        } catch(e) {}
+
+        on('.jaabro-name', 'click', function(ev) {
+          var t = ev.target.closest('.jaabro-tree');
+          var ex = t.querySelector('.jaabro-extra');
+          ex.style.display = ex.style.display === 'none' ? null : 'none';
+        });
+
+        on('.jaabro-children-count', 'click', function(ev) {
+          var t = ev.target
+            .closest('.jaabro-tree');
+          var fs = t
+            .querySelectorAll(':scope > .jaabro-children > .jaabro-failure');
+          var d = (fs[0] && fs[0].style.display === 'none') ? null : 'none';
+          fs
+            .forEach(function(f) { f.style.display = d; });
+        });
+      };
+
+      on('#in', 'keyup', render);
+
+      render();
+
     </script>
 
   </body>
