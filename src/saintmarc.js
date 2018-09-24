@@ -37,7 +37,6 @@ var SaintMarc = (function() {
     //
     // parse
 
-    //function lfcr(i) { return rex(null, i, /^[\n\r]/); }
     function eol(i) { return rex(null, i, /[\n\r]|$/); }
 
     function doubleu(i) { return str(null, i, '__'); }
@@ -75,14 +74,14 @@ var SaintMarc = (function() {
 
     function pl(i) { return seq('pl', i, il, '+', eol); }
 
-    function oll(i) { return rex('oll', i, /^\d+\.[\t ]+[^\n\r]*[\n\r]/); }
-      // FIXME
-    function ull(i) { return rex('oll', i, /^[-*][\t ]+[^\n\r]*[\n\r]/); }
-      // FIXME
+    function olh(i) { return rex(null, i, /\d+\.[\t ]+/); }
+    function oll(i) { return seq('oll', i, olh, il, '+', eol); }
+    function ulh(i) { return rex(null, i, /[-*][\t ]+/); }
+    function ull(i) { return seq('ull', i, ulh, il, '+', eol); }
 
-    function bl(i) { return rex(null, i, /^[ \t]*[\n\r]/); } // blank line
+    function bl(i) { return rex(null, i, /[ \t]*[\n\r]/); } // blank line
 
-    function hr(i) { return rex('hr', i, /^(---|\*\*\*|___)[\n\r]/); }
+    function hr(i) { return rex('hr', i, /(---|\*\*\*|___)[\n\r]/); }
     function p(i) { return rep('p', i, pl, 1); }
     function ol(i) { return rep('ol', i, oll, 1); }
     function ul(i) { return rep('ul', i, ull, 1); }
@@ -96,7 +95,7 @@ var SaintMarc = (function() {
     // rewrite
 
     // gather named children and rewrite them
-    function rwcn(t, concat) { return t.subgather(null).map(rewrite); }
+    function rwcn(t) { return t.subgather(null).map(rewrite); }
 
     function rwts(t) { return t.string(); }
 
@@ -104,7 +103,7 @@ var SaintMarc = (function() {
 
     var rewrite_ltext = rwts;
     var rewrite_lhref = rwts;
-    function rewrite_link(t) { return [ 'a', rwcn(t, false) ]; }
+    function rewrite_link(t) { return [ 'a', rwcn(t) ]; }
 
     function rewrite_em(t) { return [ 'em', rwcn(t) ]; }
     function rewrite_del(t) { return [ 'del', rwcn(t) ]; }
@@ -113,12 +112,8 @@ var SaintMarc = (function() {
     function rewrite_hr(t) { return [ 'hr' ]; }
 
     var rewrite_pl = rwcn;
-
-    function rewrite_ull(t) {
-      var s = t.string(); var i = Math.max(s.indexOf(' '), s.indexOf('	'));
-      return s.slice(i).trim();
-    }
-    var rewrite_oll = rewrite_ull;
+    var rewrite_ull = rwcn;
+    var rewrite_oll = rwcn;
 
     function rewrite_p(t) { return [ 'p', rwcn(t) ]; }
     function rewrite_ul(t) { return [ 'ul', rwcn(t) ]; }

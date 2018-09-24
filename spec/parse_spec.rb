@@ -71,7 +71,15 @@ describe 'SaintMarc' do
         '**multiplication**: 1 * 3' =>
           [ 'p', [
             [ [ 'strong', [ 'multiplication' ] ], ': 1 * 3' ]
-          ] ]
+          ] ],
+        "* point **1**\n" =>
+          [ 'ul', [
+            [ 'point ', [ 'strong', [ '1' ] ] ]
+          ] ],
+        "12. point **12**" =>
+          [ 'ol', [
+            [ 'point ', [ 'strong', [ '12' ] ] ]
+          ] ],
 
       }.each do |k, v|
 
