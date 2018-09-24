@@ -125,14 +125,6 @@
       var o = SaintMarc.parse(s);
       elt('#out').textContent = JSON.stringify(o);
 
-      // #tree
-      //
-      //var t = SaintMarc.parse(s, { debug: 1 });
-      //clog(t);
-      //clog(document.querySelectorAll('#tree > div'));
-      //removeAll('#tree > div');
-      //elt('#tree').appendChild(t.toHtml());
-
       // #debug-tree
       //
       var t = SaintMarc.parse(s, { debug: 3 });
@@ -144,7 +136,9 @@
         .forEach(function(e) { e.style.display = 'none'; });
       elts('.jaabro-failure')
         .forEach(function(e) { e.style.display = 'none'; });
-      elt('#debug-tree > .jaabro-failure').style.display = null;
+      try {
+        elt('#debug-tree > .jaabro-failure').style.display = null;
+      } catch(e) {}
 
       on('.jaabro-name', 'click', function(ev) {
         var t = ev.target.closest('.jaabro-tree');

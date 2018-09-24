@@ -46,8 +46,8 @@ var SaintMarc = (function() {
     function u(i) { return str(null, i, '_'); }
     //function a(i) { return str(null, i, '*'); }
 
-    //function plain(i) { return rex('plain', i, /[^\r\n*_~\[\]()]+/); }
-    function plain(i) { return rex('plain', i, /[^\r\n*_~\[\]()]+|[^\n\r]/); }
+    function plain(i) {
+      return rex('plain', i, /[^\r\n*_~\[\]()]+|\*[^*]|~[^~]|_[^_]/); }
 
     function startb(i) { return str(null, i, '['); }
     function endb(i) { return str(null, i, ']'); }
@@ -95,15 +95,28 @@ var SaintMarc = (function() {
     //
     // rewrite
 
-    function rwcn(t) { return t.subgather(null).map(rewrite); }
-      // gather named children and rewrite them
+    // gather named children and rewrite them, concat strings
+    //
+    function rwcn(t, concat) {
+      var a = t.subgather(null).map(rewrite);
+      if (concat === false) return a;
+      var r = [];
+      var s = null;
+      a.forEach(function(e) {
+        if (typeof e !== 'string') { if (s) r.push(s); s = null; r.push(e); }
+        else { if ( ! s) s = ''; s = s + e; }
+      });
+      if (s) r.push(s);
+      return r;
+    }
+
     function rwts(t) { return t.string(); }
 
     var rewrite_plain = rwts;
 
     var rewrite_ltext = rwts;
     var rewrite_lhref = rwts;
-    function rewrite_link(t) { return [ 'a', rwcn(t) ]; }
+    function rewrite_link(t) { return [ 'a', rwcn(t, false) ]; }
 
     function rewrite_em(t) { return [ 'em', rwcn(t) ]; }
     function rewrite_del(t) { return [ 'del', rwcn(t) ]; }

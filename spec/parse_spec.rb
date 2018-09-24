@@ -53,9 +53,6 @@ describe 'SaintMarc' do
         '~~strikethrough~~' => [ 'del', [ 'strikethrough' ] ],
         '[here](http://x.com/here)' => [ 'a', [ 'here', 'http://x.com/here' ] ],
 
-        '**multiplication** 1 * 3' =>
-          [],
-
       }.each do |k, v|
 
         it "reads #{k.inspect} as #{v.inspect}" do
@@ -63,6 +60,26 @@ describe 'SaintMarc' do
           d = js "return SaintMarc.parse(#{k.inspect});"
 
           expect(d[1][0][1][0]).to eq([ v ])
+        end
+      end
+    end
+
+    context 'with inlines (2)' do
+
+      {
+
+        '**multiplication**: 1 * 3' =>
+          [ 'p', [
+            [ [ 'strong', [ 'multiplication' ] ], ': 1 * 3' ]
+          ] ]
+
+      }.each do |k, v|
+
+        it "reads #{k.inspect} as #{v.inspect}" do
+
+          d = js "return SaintMarc.parse(#{k.inspect});"
+
+          expect(d[1][0]).to eq(v)
         end
       end
     end
