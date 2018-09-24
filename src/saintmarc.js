@@ -99,7 +99,7 @@ var SaintMarc = (function() {
 
     function rwts(t) { return t.string(); }
 
-    var rewrite_plain = rwts;
+    function rewrite_plain(t) { return [ 'span', t.string() ] }
 
     var rewrite_ltext = rwts;
     var rewrite_lhref = rwts;
@@ -115,15 +115,51 @@ var SaintMarc = (function() {
     var rewrite_ull = rwcn;
     var rewrite_oll = rwcn;
 
-    function rewrite_p(t) { return [ 'p', rwcn(t) ]; }
-    function rewrite_ul(t) { return [ 'ul', rwcn(t) ]; }
-    function rewrite_ol(t) { return [ 'ol', rwcn(t) ]; }
+    var flatten = function(a) {
+      var r = []; a.forEach(function(e) { r = r.concat(e); }); return r;
+    };
+
+    function rewrite_p(t) { return [ 'p', flatten(rwcn(t)) ]; }
+    function rewrite_ul(t) { return [ 'ul', flatten(rwcn(t)) ]; }
+    function rewrite_ol(t) { return [ 'ol', flatten(rwcn(t)) ]; }
 
     function rewrite_doc(t) { return [ 'doc', rwcn(t) ]; }
   });
 
   //
   // protected methods
+
+  var _c = function(parentElt, tag, atts, text) {
+    var ss = tag.split('.');
+    var t = ss.shift(); if (t === '') t = 'div';
+    var e = document.createElement(t);
+    for (var k in (atts || {})) { e.setAttribute(k, atts[k]); }
+    e.className = ss.map(function(c) { return 'saintmarc' + c; }).join(' ');
+    e.textContent = text || '';
+    if (parentElt) parentElt.appendChild(e);
+    return e;
+  };
+
+  var r = {};
+  r.doc = function(t, opts) {
+    var e = _c(null, '.-doc');
+    opts.parent = e; t[1].forEach(function(c) { render(c, opts); });
+    return e;
+  };
+  r.p = function(t, opts) {
+clog(t);
+    var e = _c(opts.parent, 'p');
+clog(t[1]);
+    opts.parent = e; t[1].forEach(function(c) { render(c, opts); });
+    return e;
+  };
+
+  var render = function(t, opts) {
+    opts = opts || {};
+    if (typeof t === 'string') return _c(opts.parent, 'span.-text', {}, t);
+    var f = r[ t[0]]; if ( ! f) throw "no renderer for \"" + t[0] + "\"";
+    return f(t, opts);
+  };
 
   //
   // public methods
@@ -133,6 +169,15 @@ var SaintMarc = (function() {
     if (typeof s !== 'string') return null;
 
     return Parser.parse(s, opts);
+  };
+
+  this.toHtml = function(s, opts) {
+
+    var t = self.parse(s, opts);
+    if ( ! t) return null;
+
+    //return self['render_' + t[0]](t, opts);
+    return render(t, opts);
   };
 
   //

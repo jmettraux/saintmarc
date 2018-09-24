@@ -31,11 +31,11 @@ describe 'SaintMarc' do
       }).to eq(
         [ 'doc', [
           [ 'p', [
-            [ 'This is our test' ]
+            [ 'span', 'This is our test' ]
           ] ],
           [ 'p', [
-            [ 'This is another paragraph' ]
-          ] ]
+            [ 'span', 'This is another paragraph' ]
+          ] ],
         ] ]
       )
     end
@@ -47,10 +47,10 @@ describe 'SaintMarc' do
       {
 
         #'*emphasis*' => [ 'em', [ 'emphasis' ] ],
-        '_emphasis_' => [ 'em', [ 'emphasis' ] ],
-        '**strong**' => [ 'strong', [ 'strong' ] ],
-        '__strong__' => [ 'strong', [ 'strong' ] ],
-        '~~strikethrough~~' => [ 'del', [ 'strikethrough' ] ],
+        '_emphasis_' => [ 'em', [ [ 'span', 'emphasis' ] ] ],
+        '**strong**' => [ 'strong', [ [ 'span', 'strong' ] ] ],
+        '__strong__' => [ 'strong', [ [ 'span', 'strong' ] ] ],
+        '~~strikethrough~~' => [ 'del', [ [ 'span', 'strikethrough' ] ] ],
         '[here](http://x.com/here)' => [ 'a', [ 'here', 'http://x.com/here' ] ],
 
       }.each do |k, v|
@@ -59,7 +59,7 @@ describe 'SaintMarc' do
 
           d = js "return SaintMarc.parse(#{k.inspect});"
 
-          expect(d[1][0][1][0]).to eq([ v ])
+          expect(d[1][0][1][0]).to eq(v)
         end
       end
     end
@@ -70,20 +70,37 @@ describe 'SaintMarc' do
 
         '**multiplication**: 1 * 3' =>
           [ 'p', [
-            [ [ 'strong', [ 'multiplication' ] ], ': 1 * 3' ]
+            [ 'strong', [ [ 'span', 'multiplication' ] ] ],
+            [ 'span', ': 1 * 3' ]
           ] ],
         "* point **1**\n" =>
           [ 'ul', [
-            [ 'point ', [ 'strong', [ '1' ] ] ]
+            [ 'span', 'point ' ], [ 'strong', [ [ 'span', '1' ] ] ]
           ] ],
         "12. point **12**" =>
           [ 'ol', [
-            [ 'point ', [ 'strong', [ '12' ] ] ]
+            [ 'span', 'point ' ], [ 'strong', [ [ 'span', '12' ] ] ]
+          ] ],
+        %{
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat.
+        }.strip =>
+          [ 'p', [
+            [ 'span',
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod" ],
+            [ 'span',
+"tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam," ],
+            [ 'span',
+"quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo" ],
+            [ 'span',
+"consequat." ]
           ] ],
 
       }.each do |k, v|
 
-        it "reads #{k.inspect} as #{v.inspect}" do
+        it "parses \"#{k[0, 40].gsub(/\n/, '')}...\"" do
 
           d = js "return SaintMarc.parse(#{k.inspect});"
 
