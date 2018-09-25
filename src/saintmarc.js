@@ -168,6 +168,12 @@ var SaintMarc = (function() {
     };
   }
 
+  r.a = function(t, opts) {
+    var e = _c(opts.parent, 'a.-a', t[1][0]);
+    e.setAttribute('href', t[1][1]);
+    return e;
+  };
+
   r.strong = makeTagRenderer('strong');
   r.del = makeTagRenderer('del');
   r.ul = makeTagRenderer('ul');

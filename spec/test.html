@@ -20,7 +20,7 @@
       pre {
         font-size: 77%;
         border: 1px solid black;
-        height: 21em;
+        height: fit-content;
         padding: 3px;
         white-space: pre-wrap;
         word-break: break-word;
@@ -29,7 +29,6 @@
       #parse-tree {
         font-size: 84%;
         font-family: monospace;
-        width: 70em;
       }
       .jaabro-children {
         padding-left: 1em;
@@ -80,12 +79,14 @@
 
     <h2>in:</h2>
     <textarea id="in">
-Counting to 3:
+Counting to five:
 
 0. one,
 0. two,
 0. and **four**.
 0. and ~~stricken~~
+
+Click [here](http://example.com/).
     </textarea>
 
     <h2>tree:</h2>
