@@ -46,7 +46,8 @@ var SaintMarc = (function() {
     //function a(i) { return str(null, i, '*'); }
 
     function plain(i) {
-      return rex('plain', i, /(\*[^*]|~[^~]|[^\r\n*_~\[\]()])+/); }
+      return rex( 'plain', i,
+        /(<[^\/a-zA-Z0-9]+|\*[^*]|~[^~]|[^\r\n<*_~\[\]()])+/); }
 
     function startb(i) { return str(null, i, '['); }
     function endb(i) { return str(null, i, ']'); }
@@ -69,7 +70,11 @@ var SaintMarc = (function() {
     function astrong(i) { return seq(null, i, doublea, il, '+', doublea); }
     function strong(i) { return alt('strong', i, astrong, ustrong); }
 
-    function il(i) { return alt(null, i, strong, em, del, link, plain); }
+    function ctag(i) { return rex(null, i, /<\/[a-zA-Z0-9]+>/); }
+    function otag(i) { return rex(null, i, /<[a-zA-Z0-9]+\/?>/); }
+    function tag(i) { return alt('tag', i, otag, ctag); }
+
+    function il(i) { return alt(null, i, tag, strong, em, del, link, plain); }
       // InLine
 
     function pl(i) { return seq('pl', i, il, '+', eol); }
@@ -86,8 +91,8 @@ var SaintMarc = (function() {
     function ol(i) { return rep('ol', i, oll, 1); }
     function ul(i) { return rep('ul', i, ull, 1); }
 
-    function tag(i) { return alt(null, i, bl, ul, ol, hr, p); }
-    function doc(i) { return rep('doc', i, tag, 1); }
+    function block(i) { return alt(null, i, bl, ul, ol, hr, p); }
+    function doc(i) { return rep('doc', i, block, 1); }
 
     var root = doc;
 
@@ -110,6 +115,8 @@ var SaintMarc = (function() {
     function rewrite_strong(t) { return [ 'strong', rwcn(t) ]; }
 
     function rewrite_hr(t) { return [ 'hr' ]; }
+
+    function rewrite_tag(t) { return [ 'tag', t.string() ]; }
 
     var rewrite_pl = rwcn;
     var rewrite_ull = rwcn;
@@ -176,6 +183,8 @@ var SaintMarc = (function() {
 
   'strong,del,em,ul,ol,li,p'.split(',')
     .forEach(function(t) { r[t] = makeTagRenderer(t); });
+
+  r.tag = function(t, opts) { return null; }
 
   var render = function(t, opts) {
     opts = opts || {};

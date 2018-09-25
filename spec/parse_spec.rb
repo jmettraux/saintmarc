@@ -40,6 +40,29 @@ describe 'SaintMarc' do
       )
     end
 
+    it 'ignores basic raw HTML' do
+
+      expect(js %q{
+        return SaintMarc.parse(
+          'This is our <strong>test</strong>.\n' +
+          'It sucks,<br>it very much sucks<br/>\n');
+      }).to eq(
+        [ 'doc', [
+          [ 'p', [
+            [ 'span', 'This is our ' ],
+            [ 'tag', '<strong>' ],
+            [ 'span', 'test' ],
+            [ 'tag', '</strong>' ],
+            [ 'span', '.' ],
+            [ 'span', 'It sucks,' ],
+            [ 'tag', '<br>' ],
+            [ 'span', 'it very much sucks' ],
+            [ 'tag', '<br/>' ],
+          ] ]
+        ] ]
+      )
+    end
+
     it 'ignores raw HTML'
 
     context 'with inlines' do
