@@ -46,7 +46,7 @@ var SaintMarc = (function() {
     //function a(i) { return str(null, i, '*'); }
 
     function plain(i) {
-      return rex('plain', i, /(\*[^*]|_[^_]|~[^~]|[^\r\n*_~\[\]()])+/); }
+      return rex('plain', i, /(\*[^*]|~[^~]|[^\r\n*_~\[\]()])+/); }
 
     function startb(i) { return str(null, i, '['); }
     function endb(i) { return str(null, i, ']'); }
@@ -174,12 +174,8 @@ var SaintMarc = (function() {
     return e;
   };
 
-  r.strong = makeTagRenderer('strong');
-  r.del = makeTagRenderer('del');
-  r.ul = makeTagRenderer('ul');
-  r.ol = makeTagRenderer('ol');
-  r.li = makeTagRenderer('li');
-  r.p = makeTagRenderer('p');
+  'strong,del,em,ul,ol,li,p'.split(',')
+    .forEach(function(t) { r[t] = makeTagRenderer(t); });
 
   var render = function(t, opts) {
     opts = opts || {};

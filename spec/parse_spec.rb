@@ -130,6 +130,12 @@ consequat.
               [ 'strong', [
                 [ 'span', 'ee' ] ] ], [ 'span', '.' ] ] ]
           ] ],
+        '**strong** and _emphatic_' =>
+          [ 'p', [
+            [ 'strong', [ [ 'span', 'strong' ] ] ],
+            [ 'span', ' and ' ],
+            [ 'em', [ [ 'span', 'emphatic' ] ] ]
+          ] ],
 
       }.each do |k, v|
 
