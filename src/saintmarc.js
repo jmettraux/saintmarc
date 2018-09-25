@@ -152,13 +152,7 @@ var SaintMarc = (function() {
 
   r.doc = function(t, opts) {
     var e = _c(null, '.-doc');
-    var os = _no(opts, e); t[1].forEach(function(c) { render(c, os); });
-    return e;
-  };
-
-  r.p = function(t, opts) {
-    var e = _c(opts.parent, 'p.-p');
-    var os = _no(opts, e); t[1].forEach(function(c) { render(c, os); });
+    t[1].forEach(function(c) { render(c, _no(opts, e)); });
     return e;
   };
 
@@ -166,27 +160,20 @@ var SaintMarc = (function() {
     return _c(opts.parent, 'span.-span', t[1]);
   };
 
-  r.strong = function(t, opts) {
-    var e = _c(opts.parent, 'strong.-strong');
-    var os = _no(opts, e); t[1].forEach(function(c) { render(c, os); });
-    return e;
-  };
-
-  var makeListRenderer = function(tag) {
+  var makeTagRenderer = function(tag) {
     return function(t, opts) {
       var e = _c(opts.parent, tag + '.-' + tag);
       t[1].forEach(function(c) { render(c, _no(opts, e)); });
       return e;
     };
   }
-  r.ul = makeListRenderer('ul');
-  r.ol = makeListRenderer('ol');
 
-  r.li = function(t, opts) {
-    var e = _c(opts.parent, 'li.-li');
-    t[1].forEach(function(c) { render(c, _no(opts, e)); });
-    return e;
-  };
+  r.strong = makeTagRenderer('strong');
+  r.del = makeTagRenderer('del');
+  r.ul = makeTagRenderer('ul');
+  r.ol = makeTagRenderer('ol');
+  r.li = makeTagRenderer('li');
+  r.p = makeTagRenderer('p');
 
   var render = function(t, opts) {
     opts = opts || {};
