@@ -20,8 +20,8 @@ pkg_plain:
 
 pkg_mini:
 	mkdir -p pkg
-	printf "/* saintmarc-$(VERSION).min.js | MIT license: http://github.com/jmettraux/h.js/LICENSE.txt */" > pkg/saintmarc-$(VERSION).min.js
-	java -jar tools/closure-compiler.jar --js src/h.js >> pkg/saintmarc-$(VERSION).min.js
+	printf "/* saintmarc-$(VERSION).min.js | MIT license: http://github.com/jmettraux/saintmarc.js/LICENSE.txt */" > pkg/saintmarc-$(VERSION).min.js
+	java -jar tools/closure-compiler.jar --js src/saintmarc.js >> pkg/saintmarc-$(VERSION).min.js
 	echo "/* minified from commit $(SHA) on $(NOW) */" >> pkg/saintmarc-$(VERSION).min.js
 	cp pkg/saintmarc-$(VERSION).min.js pkg/saintmarc-$(VERSION)-$(SHA).min.js
 
