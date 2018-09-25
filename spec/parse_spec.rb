@@ -75,11 +75,15 @@ describe 'SaintMarc' do
           ] ],
         "* point **1**\n" =>
           [ 'ul', [
-            [ 'span', 'point ' ], [ 'strong', [ [ 'span', '1' ] ] ]
+            [ 'li', [
+              [ 'span', 'point ' ], [ 'strong', [ [ 'span', '1' ] ] ]
+            ] ],
           ] ],
         "12. point **12**" =>
           [ 'ol', [
-            [ 'span', 'point ' ], [ 'strong', [ [ 'span', '12' ] ] ]
+            [ 'li', [
+              [ 'span', 'point ' ], [ 'strong', [ [ 'span', '12' ] ] ]
+            ] ],
           ] ],
         %{
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
@@ -96,6 +100,35 @@ consequat.
 "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo" ],
             [ 'span',
 "consequat." ]
+          ] ],
+        %{
+* abc
+* d**e**f
+* ghi
+        }.strip =>
+          [ 'ul', [
+            [ 'li', [
+              [ 'span', 'abc' ] ] ],
+            [ 'li', [
+              [ 'span', 'd' ], [ 'strong', [ [ 'span', 'e' ] ] ],
+              [ 'span', 'f' ] ] ],
+            [ 'li', [
+              [ 'span', 'ghi' ] ] ]
+          ] ],
+        %{
+0. one,
+0. two,
+0. thr**ee**.
+        }.strip =>
+          [ 'ol', [
+            [ 'li', [
+              [ 'span', 'one,' ] ] ],
+            [ 'li', [
+              [ 'span', 'two,' ] ] ],
+            [ 'li', [
+              [ 'span', 'thr' ],
+              [ 'strong', [
+                [ 'span', 'ee' ] ] ], [ 'span', '.' ] ] ]
           ] ],
 
       }.each do |k, v|
