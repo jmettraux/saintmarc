@@ -150,7 +150,7 @@ var SaintMarc = (function() {
     var e = document.createElement(t);
     //for (var k in (atts || {})) { e.setAttribute(k, atts[k]); }
     //e.className = ss.map(function(c) { return 'saintmarc' + c; }).join(' ');
-    e.className = ss.join(' ');
+    if (ss.length > 0) e.className = ss.join(' ');
     e.textContent = text || '';
     if (parentElt) parentElt.appendChild(e);
     return e;
