@@ -149,7 +149,8 @@ var SaintMarc = (function() {
     var t = ss.shift(); if (t === '') t = 'div';
     var e = document.createElement(t);
     //for (var k in (atts || {})) { e.setAttribute(k, atts[k]); }
-    e.className = ss.map(function(c) { return 'saintmarc' + c; }).join(' ');
+    //e.className = ss.map(function(c) { return 'saintmarc' + c; }).join(' ');
+    e.className = ss.join(' ');
     e.textContent = text || '';
     if (parentElt) parentElt.appendChild(e);
     return e;
@@ -163,25 +164,23 @@ var SaintMarc = (function() {
   var r = {};
 
   r.doc = function(t, opts) {
-    var e = _c(null, '.-doc');
+    var e = _c(null, '.saintmarc-doc');
     t[1].forEach(function(c) { render(c, _no(opts, e)); });
     return e;
   };
 
-  r.span = function(t, opts) {
-    return _c(opts.parent, 'span.-span', t[1]);
-  };
+  r.span = function(t, opts) { return _c(opts.parent, 'span', t[1]); };
 
   var makeTagRenderer = function(tag) {
     return function(t, opts) {
-      var e = _c(opts.parent, tag + '.-' + tag);
+      var e = _c(opts.parent, tag);
       t[1].forEach(function(c) { render(c, _no(opts, e)); });
       return e;
     };
   }
 
   r.a = function(t, opts) {
-    var e = _c(opts.parent, 'a.-a', t[1][0]);
+    var e = _c(opts.parent, 'a', t[1][0]);
     e.setAttribute('href', t[1][1]);
     return e;
   };
@@ -193,7 +192,7 @@ var SaintMarc = (function() {
 
   var render = function(t, opts) {
     opts = opts || {};
-    if (typeof t === 'string') return _c(opts.parent, 'span.-text', {}, t);
+    if (typeof t === 'string') return _c(opts.parent, 'span', {}, t);
     var f = r[ t[0]]; if ( ! f) throw "no renderer for \"" + t[0] + "\"";
     return f(t, opts);
   };
