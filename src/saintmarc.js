@@ -47,7 +47,7 @@ var SaintMarc = (function() {
 
     function plain(i) {
       return rex( 'plain', i,
-        /(<[^\/a-zA-Z0-9]+|\*[^*]|~[^~]|[^\r\n<*_~\[\]()])+/); }
+        /(<[^\/a-zA-Z]+|\*[^*]|~[^~]|[^\r\n<*_~\[\]()])+/); }
 
     function startb(i) { return str(null, i, '['); }
     function endb(i) { return str(null, i, ']'); }
@@ -70,9 +70,14 @@ var SaintMarc = (function() {
     function astrong(i) { return seq(null, i, doublea, il, '+', doublea); }
     function strong(i) { return alt('strong', i, astrong, ustrong); }
 
-    function ctag(i) { return rex(null, i, /<\/[a-zA-Z0-9]+>/); }
-    function otag(i) { return rex(null, i, /<[a-zA-Z0-9]+\/?>/); }
-    function tag(i) { return alt('tag', i, otag, ctag); }
+    function ctag(i) {
+      return rex(null, i,
+        /<\/[a-zA-Z][a-zA-Z0-9]*>/); }
+    function otag(i) {
+      return rex(null, i,
+        /<[a-zA-Z][a-zA-Z0-9]*(\s+[a-zA-z]+\s*=\s*"[^"]*")*\/?\s*>/); }
+    function tag(i) {
+      return alt('tag', i, otag, ctag); }
 
     function il(i) { return alt(null, i, tag, strong, em, del, link, plain); }
       // InLine

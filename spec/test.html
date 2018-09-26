@@ -79,6 +79,9 @@
 
     <h2>in:</h2>
     <textarea id="in">
+This is a &lt;a href="http://example.com/?a=b"&gt;link</a>.
+    </textarea>
+<!--
 Counting to five:
 
 0. **one**.
@@ -88,7 +91,7 @@ Counting to five:
 Click [here](http://example.com/).
 
 **bold** and _italic_.
-    </textarea>
+-->
 
     <h2>tree:</h2>
     <pre id="tree"></pre>
@@ -120,19 +123,22 @@ Click [here](http://example.com/).
 
       var toPre = function(depth, tree, out) {
 
-        var ind = ''; for (var i = 0; i < depth; i++) ind = ind + '  ';
+        try {
+          var ind = ''; for (var i = 0; i < depth; i++) ind = ind + '  ';
 
-        out = out + ind + tree[0];
+          out = out + ind + tree[0];
 
-        if (Array.isArray(tree[1])) {
-          tree[1]
-            .forEach(function(c) {
-              out = out + '\n'; out = toPre(depth + 1, c, out); });
+          if (Array.isArray(tree[1])) {
+            tree[1]
+              .forEach(function(c) {
+                out = out + '\n'; out = toPre(depth + 1, c, out); });
+          }
+          else {
+            out = out + ' ' + JSON.stringify(tree[1]);
+          }
+        } catch(e) {
+          //console.error('toPre() intercepted', e);
         }
-        else {
-          out = out + ' ' + JSON.stringify(tree[1]);
-        }
-
         return out;
       };
 
@@ -150,7 +156,7 @@ Click [here](http://example.com/).
         var e = SaintMarc.toHtml(s);
         //clog(e);
         removeAll('#out > *');
-        elt('#out').appendChild(e);
+        if (e) elt('#out').appendChild(e);
 
         // #parse-tree
         //

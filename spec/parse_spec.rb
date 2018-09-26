@@ -63,7 +63,26 @@ describe 'SaintMarc' do
       )
     end
 
-    it 'ignores raw HTML'
+    it 'ignores raw HTML' do
+
+      expect(js %q{
+        return SaintMarc.parse(
+          'This is a <a href="http://example.com/?a=b">link</a>.\n' +
+          '1 <7> 4\n' +
+          '1 < 7 > 4\n')
+      }).to eq(
+        [ 'doc', [
+          [ 'p', [
+            [ 'span', 'This is a ' ],
+            [ 'tag', '<a href="http://example.com/?a=b">' ],
+            [ 'span', 'link' ],
+            [ 'tag', '</a>' ],
+            [ 'span', '.' ],
+            [ 'span', "1 <7> 4\n1 < 7 > 4\n" ],
+          ] ]
+        ] ]
+      )
+    end
 
     context 'with inlines' do
 
