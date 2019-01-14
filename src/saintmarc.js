@@ -139,7 +139,7 @@ var SaintMarc = (function() {
       return [ 'ol', rwcn(t).map(function(c) { return [ 'li', c ]; }) ]; }
 
     function rewrite_doc(t) { return [ 'doc', rwcn(t) ]; }
-  });
+  }); // end Parser
 
   //
   // protected methods
