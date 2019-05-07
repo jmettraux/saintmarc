@@ -7,7 +7,7 @@ A [jaabro](https://github.com/jmettraux/jaabro)-based [Markdown](https://en.wiki
 
 Saintmarc is a Markdown parser, it's written in Javascript, so, mostly, it's meant to be run in abrowser.
 
-### Saintmarc.parse
+### SaintMarc.parse
 
 ```javascript
 SaintMarc.parse(
@@ -62,7 +62,7 @@ SaintMarc.parse(
 
 Et caetera...
 
-### Saintmarc.toHtml
+### SaintMarc.toHtml
 
 Saintmarc.toHtml takes a Markdown string and turns it into HTML.
 
