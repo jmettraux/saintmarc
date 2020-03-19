@@ -5,7 +5,7 @@ A [jaabro](https://github.com/jmettraux/jaabro)-based [Markdown](https://en.wiki
 
 ## usage
 
-Saintmarc is a Markdown parser, it's written in Javascript, so, mostly, it's meant to be run in abrowser.
+Saintmarc is a Markdown parser, it's written in Javascript, so, mostly, it's meant to be run in a browser.
 
 ### SaintMarc.parse
 
