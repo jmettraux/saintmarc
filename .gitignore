@@ -1,6 +1,5 @@
 
-.vimrc
-.viminfo
+.vim*
 
 .rspec.out
 .errors
