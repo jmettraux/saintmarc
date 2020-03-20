@@ -78,8 +78,17 @@
     <h1>saintmarc</h1>
 
     <h2>in:</h2>
+    <!--
     <textarea id="in">
 This is a &lt;a href="http://example.com/?a=b"&gt;link</a>.
+    </textarea>
+    -->
+    <textarea id="in">
+- Min 80% of portfolio in bonds in the "Financial" sector according to Bloomberg "Industry Sector" classification and US Treasuries.
+- Min 70% of portfolio in bonds in "Developed Market" countries per MSCI definition according to Bloomberg "Country Risk" classification. No [China](http://example.com/china) country exposure.
+- Average portfolio duration between 0 and 8 years.
+- Credit rating must be Investment Grade (IG) at point of purchase. IG definition based on Moody's, S&P and Fitch credit rating agencies. At least rated IG by one of the agencies.
+- Max 20% of portfolio in non-IG bonds (if any downgrades after purchase) allowed with min Ba4/BB-/BB- rating.
     </textarea>
 <!--
 Counting to five:
@@ -123,18 +132,24 @@ Click [here](http://example.com/).
 
       var toPre = function(depth, tree, out) {
 
+        var s = JSON.stringify;
+
         try {
+
           var ind = ''; for (var i = 0; i < depth; i++) ind = ind + '  ';
 
           out = out + ind + tree[0];
 
-          if (Array.isArray(tree[1])) {
+          if (tree[0] === 'a') {
+            out = out + ' href:' + s(tree[1][1]) + ' ' + s(tree[1][0]);
+          }
+          else if (Array.isArray(tree[1])) {
             tree[1]
               .forEach(function(c) {
                 out = out + '\n'; out = toPre(depth + 1, c, out); });
           }
           else {
-            out = out + ' ' + JSON.stringify(tree[1]);
+            out = out + ' ' + s(tree[1]);
           }
         } catch(e) {
           //console.error('toPre() intercepted', e);

@@ -40,6 +40,53 @@ describe 'SaintMarc' do
       )
     end
 
+    it 'parses a text in parentheses' do
+
+      s =
+        "Max 20% of portfolio in non-IG bonds (if any downgrades after " +
+        "purchase) allowed with min Ba4/BB-/BB- rating."
+      t =
+        js "return SaintMarc.parse(#{s.inspect});"
+
+      expect(t).to eq(
+        ["doc",
+         [["p",
+           [["span",
+             "Max 20% of portfolio in non-IG bonds (if any downgrades after " +
+             "purchase) allowed with min Ba4/BB-/BB- rating."]]]]]
+      )
+    end
+
+    it 'parses a list of bullet points' do
+
+      s =
+        %{
+- Min 80% of portfolio in bonds in the "Financial" sector according to Bloomberg "Industry Sector" classification and US Treasuries.
+- Credit rating must be Investment Grade (IG) at point of [purchase](https://www.example.com/nada).
+- Max 20% of portfolio in non-IG bonds (if any downgrades after purchase) allowed with min Ba4/BB-/BB- rating.
+        }.strip + "\n"
+      t =
+        js "return SaintMarc.parse(#{s.inspect});"
+
+      expect(t).to eq(
+        ["doc",
+         [["ul",
+           [["li",
+             [["span",
+               "Min 80% of portfolio in bonds in the \"Financial\" sector " +
+               "according to Bloomberg \"Industry Sector\" classification " +
+               "and US Treasuries."]]],
+            ["li",
+             [["span",
+               "Credit rating must be Investment Grade (IG) at point of "],
+              ["a", ["purchase", "https://www.example.com/nada"]],
+              ["span", "."]]],
+            ["li",
+             [["span",
+               "Max 20% of portfolio in non-IG bonds (if any downgrades " +
+               "after purchase) allowed with min Ba4/BB-/BB- rating."]]]]]]])
+    end
+
     it 'ignores basic raw HTML' do
 
       expect(js %q{

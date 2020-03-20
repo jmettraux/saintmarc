@@ -47,7 +47,7 @@ var SaintMarc = (function() {
 
     function plain(i) {
       return rex( 'plain', i,
-        /(<[^\/a-zA-Z]+|\*[^*]|~[^~]|[^\r\n<*_~\[\]()])+/); }
+        /(<[^\/a-zA-Z]+|\*[^*]|~[^~]|[^\r\n<*_~[])+/); }
 
     function startb(i) { return str(null, i, '['); }
     function endb(i) { return str(null, i, ']'); }
