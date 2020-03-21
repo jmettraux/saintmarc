@@ -4,6 +4,8 @@
   <head>
     <title>test</title>
 
+    <script src="h-1.2.0-028b4eb.min.js"></script>
+
     <script src="jaabro.js"></script>
     <script src="../src/saintmarc.js"></script>
     <!--script src="helpers.js"></script-->
@@ -78,17 +80,10 @@
     <h1>saintmarc</h1>
 
     <h2>in:</h2>
-    <!--
     <textarea id="in">
 This is a &lt;a href="http://example.com/?a=b"&gt;link</a>.
-    </textarea>
-    -->
-    <textarea id="in">
-- Min 80% of portfolio in bonds in the "Financial" sector according to Bloomberg "Industry Sector" classification and US Treasuries.
-- Min 70% of portfolio in bonds in "Developed Market" countries per MSCI definition according to Bloomberg "Country Risk" classification. No [China](http://example.com/china) country exposure.
-- Average portfolio duration between 0 and 8 years.
-- Credit rating must be Investment Grade (IG) at point of purchase. IG definition based on Moody's, S&P and Fitch credit rating agencies. At least rated IG by one of the agencies.
-- Max 20% of portfolio in non-IG bonds (if any downgrades after purchase) allowed with min Ba4/BB-/BB- rating.
+
+This is another [link](http://example.org).
     </textarea>
 <!--
 Counting to five:
@@ -115,20 +110,11 @@ Click [here](http://example.com/).
 
       var clog = console.log;
 
-      var elt = function(sel) { return document.querySelector(sel); };
-      var elts = function(sel) { return document.querySelectorAll(sel); };
-
-      var removeAll = function(sel) {
-        elts(sel)
-          .forEach(function(e) { e.parentElement.removeChild(e); });
-        return undefined;
-      };
-
-      var on = function(sel, evName, evHandler) {
-        elts(sel)
-          .forEach(function(e) { e.addEventListener(evName, evHandler); });
-        return undefined;
-      };
+      //var removeAll = function(sel) {
+      //  H.elts(sel)
+      //    .forEach(function(e) { e.parentElement.removeChild(e); });
+      //  return undefined;
+      //};
 
       var toPre = function(depth, tree, out) {
 
@@ -159,42 +145,44 @@ Click [here](http://example.com/).
 
       var render = function() {
 
-        var s = elt('#in').value.trim();
+        var s = H.elt('#in').value.trim();
 
         // #tree
         //
         var t = SaintMarc.parse(s);
-        elt('#tree').textContent = toPre(0, t, '');
+        if (t) H.elt('#tree').textContent = toPre(0, t, '');
+        else H.create('#tree', 'em', {}, '(parsing failed)');
 
         // #out
         //
         var e = SaintMarc.toHtml(s);
         //clog(e);
-        removeAll('#out > *');
-        if (e) elt('#out').appendChild(e);
+        H.remove('#out > *');
+        if (e) H.elt('#out').appendChild(e);
+        else H.create('#out', 'em', {}, '(parsing failed)');
 
         // #parse-tree
         //
         var t = SaintMarc.parse(s, { debug: 3 });
         //clog(t);
-        removeAll('#parse-tree > div');
-        elt('#parse-tree').appendChild(t.toHtml());
+        H.remove('#parse-tree > div');
+        H.elt('#parse-tree').appendChild(t.toHtml());
 
-        elts('.jaabro-extra')
+        H.elts('.jaabro-extra')
           .forEach(function(e) { e.style.display = 'none'; });
-        elts('.jaabro-failure')
+        H.elts('.jaabro-failure')
           .forEach(function(e) { e.style.display = 'none'; });
         try {
-          elt('#parse-tree > .jaabro-failure').style.display = null;
+          H.elt('#parse-tree > .jaabro-failure').style.display = null;
         } catch(e) {}
 
-        on('.jaabro-name', 'click', function(ev) {
+        H.on('.jaabro-name', 'click', function(ev) {
           var t = ev.target.closest('.jaabro-tree');
           var ex = t.querySelector('.jaabro-extra');
           ex.style.display = ex.style.display === 'none' ? null : 'none';
         });
 
-        on('.jaabro-children-count', 'click', function(ev) {
+        H.on('.jaabro-children-count', 'click', function(ev) {
           var t = ev.target
             .closest('.jaabro-tree');
           var fs = t
@@ -205,7 +193,7 @@ Click [here](http://example.com/).
         });
       };
 
-      on('#in', 'keyup', render);
+      H.on('#in', 'keyup', render);
 
       render();
 
