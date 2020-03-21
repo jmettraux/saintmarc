@@ -14,65 +14,7 @@
       rel="stylesheet"
       href="https://meyerweb.com/eric/tools/css/reset/reset.css"
       type="text/css" /-->
-    <style>
-      textarea {
-        width: 100%;
-        height: 14em;
-      }
-      pre {
-        font-size: 77%;
-        border: 1px solid black;
-        height: fit-content;
-        padding: 3px;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-
-      #parse-tree {
-        font-size: 84%;
-        font-family: monospace;
-      }
-      .jaabro-children {
-        padding-left: 1em;
-      }
-      .jaabro-tree {
-        /*
-        width: fit-content;
-        */
-        border-top: 1px solid lightgrey;
-      }
-      .jaabro-summary:hover { background-color: lightgreen; }
-      .jaabro-failure > .jaabro-summary:hover { background-color: #ff8888; }
-      .jaabro-success {
-        border-left: 2px solid lightgreen;
-      }
-      .jaabro-failure {
-        border-left: 2px solid red;
-      }
-      .jaabro-name {
-        cursor: pointer;
-      }
-      .jaabro-children-count {
-        cursor: pointer;
-      }
-      .jaabro-summary > span {
-        padding-left: 0.35em;
-      }
-      /*.jaabro-summary > .jaabro-at { display: none; }*/
-      .jaabro-summary > .jaabro-name:not(.jaabro-no-name) {
-        font-weight: bold;
-      }
-      span.jaabro-match { float: right; }
-      span.jaabro-string { background-color: lightgreen; }
-      span.jaabro-post-string { background-color: lightgrey; }
-      .jaabro-failed-children-count {
-        padding-left: 0.35em;
-      }
-      .jaabro-parser {
-        padding-left: 0.35em;
-        opacity: 0.5;
-      }
-    </style>
+    <link rel="stylesheet" href="test.css" type="text/css" />
   </head>
 
   <body>
@@ -81,10 +23,40 @@
 
     <h2>in:</h2>
     <textarea id="in">
+1 &lt;7&gt; 4
+1 &lt; 7 &gt; 4
+    </textarea>
+    <!--
+    <textarea id="in">
+_emphasis_
+    </textarea>
+    <textarea id="in">
+&lt;a href="b"&gt;rotten &lt;em&gt;tomato&lt;/em&gt; chips&lt;/a&gt;
+    </textarea>
+    <textarea id="in">
+&lt;dl&gt;
+  &lt;dt&gt;Definition list&lt;/dt&gt;
+  &lt;dd&gt;Is something people use sometimes.&lt;/dd&gt;
+  &lt;dt&gt;Markdown in HTML&lt;/dt&gt;
+  &lt;dd&gt;Does *not* work **very** well. Use HTML &lt;em&gt;tags&lt;/em&gt;.&lt;/dd&gt;
+&lt;/dl&gt;
+    </textarea>
+    <textarea id="in">
+* abc
+* def
+* ghi
+
+1. nada
+2. surf
+3. corona
+    </textarea>
+    <textarea id="in">
 This is a &lt;a href="http://example.com/?a=b"&gt;link</a>.
 
 This is another [link](http://example.org).
+abc<br>def<br/>ghi<br>jkl<br/>mno
     </textarea>
+    -->
 <!--
 Counting to five:
 
@@ -103,43 +75,46 @@ Click [here](http://example.com/).
     <h2>out:</h2>
     <div id="out"></div>
 
-    <h2>parse tree:</h2>
+    <h2><span id="toggle-failure">parse</span> <span id="toggle-extra">tree</span>:</h2>
     <div id="parse-tree"></div>
 
     <script>
 
       var clog = console.log;
 
-      //var removeAll = function(sel) {
-      //  H.elts(sel)
-      //    .forEach(function(e) { e.parentElement.removeChild(e); });
-      //  return undefined;
-      //};
-
       var toPre = function(depth, tree, out) {
 
-        var s = JSON.stringify;
+        //try {
 
-        try {
+        var ind = ''; for (var i = 0; i < depth; i++) ind = ind + '  ';
+        out = out + (depth === 0 ? '' : '\n') + ind;
 
-          var ind = ''; for (var i = 0; i < depth; i++) ind = ind + '  ';
+        if (typeof tree === 'string') {
 
-          out = out + ind + tree[0];
+          out = out + JSON.stringify(tree);
+        }
+        else {
 
-          if (tree[0] === 'a') {
-            out = out + ' href:' + s(tree[1][1]) + ' ' + s(tree[1][0]);
+          out = out + tree[0];
+
+          for (var k in tree[1]) {
+            out = out + ' ' + k + ': ' + JSON.stringify(tree[1][k]);
           }
-          else if (Array.isArray(tree[1])) {
-            tree[1]
-              .forEach(function(c) {
-                out = out + '\n'; out = toPre(depth + 1, c, out); });
+          if (
+            Object.keys(tree[1]).length < 1 &&
+            tree[2].length === 1 &&
+            (typeof tree[2][0]) === 'string'
+          ) {
+            out = out + ' ' + JSON.stringify(tree[2][0]);
           }
           else {
-            out = out + ' ' + s(tree[1]);
+            tree[2].forEach(function(tt) {
+              out = toPre(depth + 1, tt, out);
+            });
           }
-        } catch(e) {
-          //console.error('toPre() intercepted', e);
         }
+        //} catch(e) { console.error('toPre() intercepted', e); }
+
         return out;
       };
 
@@ -151,7 +126,7 @@ Click [here](http://example.com/).
         //
         var t = SaintMarc.parse(s);
         if (t) H.elt('#tree').textContent = toPre(0, t, '');
-        else H.create('#tree', 'em', {}, '(parsing failed)');
+        else H.create(H.elt('#tree'), 'em', {}, '(parsing failed)');
 
         // #out
         //
@@ -159,7 +134,7 @@ Click [here](http://example.com/).
         //clog(e);
         H.remove('#out > *');
         if (e) H.elt('#out').appendChild(e);
-        else H.create('#out', 'em', {}, '(parsing failed)');
+        else H.create(H.elt('#out'), 'em', {}, '(parsing failed)');
 
         // #parse-tree
         //
@@ -191,6 +166,18 @@ Click [here](http://example.com/).
           fs
             .forEach(function(f) { f.style.display = d; });
         });
+
+        function makeTog(k) {
+          return function(ev) {
+            var d =
+              (H.elt('.jaabro-' + k).style.display === 'none') ?
+              null :
+              'none';
+            H.forEach('.jaabro-' + k, function(e) { e.style.display = d; });
+          };
+        }
+        H.on('#toggle-failure', 'click', makeTog('failure'));
+        H.on('#toggle-extra', 'click', makeTog('extra'));
       };
 
       H.on('#in', 'keyup', render);

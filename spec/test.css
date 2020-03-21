@@ -1,0 +1,64 @@
+
+/* spec/test.css */
+
+textarea {
+  width: 100%;
+  height: 14em;
+}
+pre {
+  font-size: 77%;
+  border: 1px solid black;
+  height: fit-content;
+  padding: 3px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#parse-tree {
+  font-size: 84%;
+  font-family: monospace;
+}
+.jaabro-children {
+  padding-left: 1em;
+}
+.jaabro-tree {
+  /*
+  width: fit-content;
+  */
+  border-top: 1px solid lightgrey;
+}
+.jaabro-summary:hover { background-color: lightgreen; }
+.jaabro-failure > .jaabro-summary:hover { background-color: #ff8888; }
+.jaabro-success {
+  border-left: 2px solid lightgreen;
+}
+.jaabro-failure {
+  border-left: 2px solid red;
+}
+.jaabro-name {
+  cursor: pointer;
+}
+.jaabro-children-count {
+  cursor: pointer;
+}
+#toggle-failure, #toggle-extra {
+  cursor: pointer;
+}
+.jaabro-summary > span {
+  padding-left: 0.35em;
+}
+/*.jaabro-summary > .jaabro-at { display: none; }*/
+.jaabro-summary > .jaabro-name:not(.jaabro-no-name) {
+  font-weight: bold;
+}
+span.jaabro-match { float: right; }
+span.jaabro-string { background-color: lightgreen; }
+span.jaabro-post-string { background-color: lightgrey; }
+.jaabro-failed-children-count {
+  padding-left: 0.35em;
+}
+.jaabro-parser {
+  padding-left: 0.35em;
+  opacity: 0.5;
+}
+
