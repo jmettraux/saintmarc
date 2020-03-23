@@ -190,7 +190,10 @@ var SaintMarc = (function() {
     //
     // rewrite
 
-    function rwcn(t) { return t ? t.subgather(null).map(rewrite) : []; }
+    function rwcn(t/*, subname*/) {
+
+      return t ? t.subgather(arguments[1]).map(rewrite) : [];
+    }
 //    function rwcn(t) {
 //      if ( ! t) return [];
 //      var a = [];
@@ -212,7 +215,6 @@ var SaintMarc = (function() {
 //      return a;
 //    }
 //      // gather named children and rewrite them
-
 
 ////    function rewrite_del(t) { return [ 'del', {}, rwcn(t) ]; }
 //    function rewrite_em(t) { return [ 'em', {}, rwcn(t) ]; }
@@ -285,8 +287,10 @@ var SaintMarc = (function() {
     // block: lists
 
     function rewrite_ulli(t) { return [ 'li', {}, rwcn(t) ]; }
+    function rewrite_olli(t) { return [ 'li', {}, rwcn(t, 'content') ]; }
 
     function rewrite_ulist(t) { return [ 'ul', {}, rwcn(t) ]; }
+    function rewrite_olist(t) { return [ 'ol', {}, rwcn(t) ]; }
 
     // block: para
 
