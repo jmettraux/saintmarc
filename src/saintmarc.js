@@ -140,7 +140,7 @@ var SaintMarc = (function() {
 
     // line: content
 
-    function content(i) { return rex(n, i, /[^\r\n$]+/); } // FIXME
+    function content(i) { return rex('content', i, /[^\r\n$]+/); } // FIXME
 
     // block: lists
 
@@ -169,7 +169,6 @@ var SaintMarc = (function() {
     function paraline(i) {
       return seq('paraline', i, list_head, '!', content, eol); }
 
-    //function para(i) { return rep('para', i, paraline, 1); }
     function para(i) {
       return seq('para', i, paraline, '+', blank_line); }
 
@@ -279,13 +278,24 @@ var SaintMarc = (function() {
 //      return [
 //        'ul', {}, rwcn(t).map(function(c) { return [ 'li', {}, c ]; }) ]; }
 
-    function rewrite_paraline(t) {
-      return [ 'span', {}, t.string().trim() ]; }
-    function rewrite_para(t) {
-      return [ 'p', {}, rwcn(t) ]; }
+    // line: content
 
-    function rewrite_doc(t) {
-      return [ 'doc', {}, rwcn(t) ]; }
+    function rewrite_content(t) { return [ 'span', {}, t.string() ]; } // FIXME
+
+    // block: lists
+
+    function rewrite_ulli(t) { return [ 'li', {}, rwcn(t) ]; }
+
+    function rewrite_ulist(t) { return [ 'ul', {}, rwcn(t) ]; }
+
+    // block: para
+
+    function rewrite_paraline(t) { return [ 'span', {}, t.string().trim() ]; }
+    function rewrite_para(t) { return [ 'p', {}, rwcn(t) ]; }
+
+    // root
+
+    function rewrite_doc(t) { return [ 'doc', {}, rwcn(t) ]; }
   }); // end Parser
 
   //

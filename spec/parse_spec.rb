@@ -74,15 +74,15 @@ describe 'SaintMarc' do
                 "according to Bloomberg \"Industry Sector\" classification " +
                 "and US Treasuries." ] ] ] ],
             [ "li", {}, [
-              [ "span", {}, [
-                "Credit rating must be Investment Grade (IG) at point of " ] ],
+              [ "span", {},
+                "Credit rating must be Investment Grade (IG) at point of " ],
               [ "a", { "href" => "https://www.example.com/nada" }, [
                 "purchase" ] ],
               [ "span", {}, [ "." ] ] ] ],
             [ "li", {}, [
-              [ "span", {}, [
+              [ "span", {},
                 "Max 20% of portfolio in non-IG bonds (if any downgrades " +
-                "after purchase) allowed with min Ba4/BB-/BB- rating." ] ] ] ]
+                "after purchase) allowed with min Ba4/BB-/BB- rating." ] ] ]
             ] ] ] ])
     end
 
