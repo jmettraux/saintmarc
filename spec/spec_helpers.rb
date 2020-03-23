@@ -14,7 +14,7 @@ module Helpers
   def js(s)
 
     File.open('spec/source.js', 'wb') do |f|
-      f.puts(File.read('spec/jaabro.js'))
+      f.puts(File.read(Dir['spec/jaabro*.js'].last))
       f.puts(File.read('src/saintmarc.js'))
     end
 

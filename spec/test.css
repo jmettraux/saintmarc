@@ -62,3 +62,11 @@ span.jaabro-post-string { background-color: lightgrey; }
   opacity: 0.5;
 }
 
+#out {
+  background-color: #f0f0f0;
+  padding: 0.07em;
+}
+#out span {
+  margin-right: 0.28em;
+}
+

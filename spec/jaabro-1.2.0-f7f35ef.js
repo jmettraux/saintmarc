@@ -1,5 +1,5 @@
 
-// Copyright (c) 2015-2018, John Mettraux, jmettraux@gmail.com
+// Copyright (c) 2015-2020, John Mettraux, jmettraux@gmail.com
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
 // Made in Japan
 
 
-var Jaabro = { VERSION: '1.1.1' };
+var Jaabro = { VERSION: '1.2.0' };
 
 //
 // Jaabro.Input
@@ -183,7 +183,8 @@ Jaabro.Tree.toHtml = function(parentElement) {
   if (t.length === 80) t = t + '\u2026';
 
   var f = this.parser.toString().replace('return Jaabro.', '');
-  var fn = f.match(/^function ([^(]+)/)[1];
+  var fm = f.match(/^function ([^(]+)/);
+  var fn = fm ? fm[1] : '(core parser)';
 
   var cn = this.children.length;
   var fcn = this.children.filter(function(c) { return c.result === 0; }).length;
@@ -298,19 +299,19 @@ Jaabro.altg = function(name, input, parsers_) {
 Jaabro.qmark = function() { return [ 0, 1 ]; };
 Jaabro.star = function() { return [ 0, 0 ]; };
 Jaabro.plus = function() { return [ 1, 0 ]; };
-Jaabro.qmark.jname = 'qmark';
-Jaabro.qmark.quantifier = true;
-Jaabro.star.jname = 'star';
-Jaabro.star.quantifier = true;
-Jaabro.plus.jname = 'plus';
-Jaabro.plus.quantifier = true;
+Jaabro.bang = function() { return -1; };
+Jaabro.qmark.quantifier_name = 'qmark';
+Jaabro.star.quantifier_name = 'star';
+Jaabro.plus.quantifier_name = 'plus';
+Jaabro.bang.quantifier_name = 'bang';
 
 Jaabro.toQuantifier = function(parser) {
 
   if (parser === '?') return this.qmark;
   if (parser === '*') return this.star;
   if (parser === '+') return this.plus;
-  if (parser && parser.quantifier) return parser;
+  if (parser === '!') return this.bang;
+  if (parser && parser.quantifier_name) return parser;
   return null;
 };
 
@@ -333,11 +334,18 @@ Jaabro.seq = function(name, input, parsers_) {
   while (true) {
 
     var p = ps.shift(); if ( ! p) break;
-    if (this.toQuantifier(p)) throw new Error('lonely quantifier ' + p.jname);
 
-    var q = this.quantify(ps[0]);
+    var q = this.toQuantifier(p);
+    if (q) throw new Error("lonely quantifier '" + q.quantifier_name + "'");
 
-    if (q) {
+    q = this.quantify(ps[0]);
+
+    if (q === -1) {
+      ps.shift();
+      cr = this.nott(null, input, p);
+      r.children.push(cr);
+    }
+    else if (q) {
       ps.shift();
       cr = this.rep(null, input, p, q[0], q[1]);
       r.children = r.children.concat(cr.children);
@@ -397,6 +405,23 @@ Jaabro.ren = function(name, input, parser) {
   cr.name = name;
 
   return cr;
+};
+
+Jaabro.nott = function(name, input, parser) {
+
+  var o = input.offset;
+
+  var r = this.makeTree(name, input, 'nott', Jaabro.nott.caller);
+
+  var cr = parser(input);
+  r.children.push(cr);
+
+  r.length = 0;
+  r.result = cr.result == 1 ? 0 : 1;
+
+  input.offset = o;
+
+  return r;
 };
 
 Jaabro.all = function(name, input, parser) {
@@ -563,3 +588,4 @@ Jaabro.parse = function(string, opts) {
   return t;
 };
 
+/* from commit f7f35ef on Mon Mar 23 13:37:07 JST 2020 */

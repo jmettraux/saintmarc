@@ -29,13 +29,9 @@ describe 'SaintMarc' do
           '\n' +
           'This is another paragraph\n');
       }).to eq(
-        [ 'doc', [
-          [ 'p', [
-            [ 'span', 'This is our test' ]
-          ] ],
-          [ 'p', [
-            [ 'span', 'This is another paragraph' ]
-          ] ],
+        [ 'doc', {}, [
+          [ 'p', {}, [ [ 'span', {}, 'This is our test' ] ] ],
+          [ 'p', {}, [ [ 'span', {}, 'This is another paragraph' ] ] ],
         ] ]
       )
     end
@@ -49,11 +45,12 @@ describe 'SaintMarc' do
         js "return SaintMarc.parse(#{s.inspect});"
 
       expect(t).to eq(
-        ["doc",
-         [["p",
-           [["span",
-             "Max 20% of portfolio in non-IG bonds (if any downgrades after " +
-             "purchase) allowed with min Ba4/BB-/BB- rating."]]]]]
+        [ "doc", {}, [
+          [ "p", {}, [
+            [ "span",
+              {},
+              "Max 20% of portfolio in non-IG bonds (if any downgrades after " +
+              "purchase) allowed with min Ba4/BB-/BB- rating." ] ] ] ] ]
       )
     end
 
@@ -69,48 +66,96 @@ describe 'SaintMarc' do
         js "return SaintMarc.parse(#{s.inspect});"
 
       expect(t).to eq(
-        ["doc",
-         [["ul",
-           [["li",
-             [["span",
-               "Min 80% of portfolio in bonds in the \"Financial\" sector " +
-               "according to Bloomberg \"Industry Sector\" classification " +
-               "and US Treasuries."]]],
-            ["li",
-             [["span",
-               "Credit rating must be Investment Grade (IG) at point of "],
-              ["a", ["purchase", "https://www.example.com/nada"]],
-              ["span", "."]]],
-            ["li",
-             [["span",
-               "Max 20% of portfolio in non-IG bonds (if any downgrades " +
-               "after purchase) allowed with min Ba4/BB-/BB- rating."]]]]]]])
+        [ "doc", {}, [
+          [ "ul", {}, [
+            [ "li", {}, [
+              [ "span", {}, [
+                "Min 80% of portfolio in bonds in the \"Financial\" sector " +
+                "according to Bloomberg \"Industry Sector\" classification " +
+                "and US Treasuries." ] ] ] ],
+            [ "li", {}, [
+              [ "span", {}, [
+                "Credit rating must be Investment Grade (IG) at point of " ] ],
+              [ "a", { "href" => "https://www.example.com/nada" }, [
+                "purchase" ] ],
+              [ "span", {}, [ "." ] ] ] ],
+            [ "li", {}, [
+              [ "span", {}, [
+                "Max 20% of portfolio in non-IG bonds (if any downgrades " +
+                "after purchase) allowed with min Ba4/BB-/BB- rating." ] ] ] ]
+            ] ] ] ])
     end
 
-    it 'ignores basic raw HTML' do
+    it 'wraps inline HTML' do
 
       expect(js %q{
         return SaintMarc.parse(
           'This is our <strong>test</strong>.\n' +
           'It sucks,<br>it very much sucks<br/>\n');
       }).to eq(
-        [ 'doc', [
-          [ 'p', [
-            [ 'span', 'This is our ' ],
-            [ 'tag', '<strong>' ],
-            [ 'span', 'test' ],
-            [ 'tag', '</strong>' ],
-            [ 'span', '.' ],
-            [ 'span', 'It sucks,' ],
-            [ 'tag', '<br>' ],
-            [ 'span', 'it very much sucks' ],
-            [ 'tag', '<br/>' ],
+        [ 'doc', {}, [
+          [ 'p', {}, [
+            [ 'span', {}, [ 'This is our ' ] ],
+            [ 'strong', {}, [ 'test' ] ],
+            [ 'span', {}, [ '.' ] ],
+            [ 'span', {}, [ 'It sucks,' ] ],
+            [ 'br', {}, [] ],
+            [ 'span', {}, [ 'it very much sucks' ] ],
+            [ 'br', {}, [] ]
           ] ]
         ] ]
       )
     end
 
-    it 'ignores raw HTML' do
+    it 'wraps inline HTML' do
+      s =
+        %{
+<a href="b">rotten <em>tomato</em> chips</a>
+        }.strip + "\n"
+      t =
+        js "return SaintMarc.parse(#{JSON.dump(s)});"
+
+      expect(t).to eq(
+        [ 'doc', {}, [
+          [ 'a', { 'href' => 'b' }, [
+            'rotten ',
+            [ 'em', {}, [ 'tomato' ] ],
+            ' chips'
+          ] ]
+        ] ]
+      )
+    end
+
+    it 'wraps inline HTML' do
+
+      s =
+        %{
+<dl>
+  <dt>Definition list</dt>
+  <dd>Is something people use sometimes.</dd>
+  <dt>Markdown in HTML</dt>
+  <dd>Does *not* work **very** well. Use HTML <em>tags</em>.</dd>
+</dl>
+        }.strip + "\n"
+      t =
+        js "return SaintMarc.parse(#{JSON.dump(s)});"
+
+      expect(t).to eq(
+        [ 'doc', {}, [
+          [ 'dl', {}, [
+            [ 'dt', {}, [ 'Definition list' ] ],
+            [ 'dd', {}, [ 'Is something people use sometimes.' ] ],
+            [ 'dt', {}, [ 'Markdown in HTML' ] ],
+            [ 'dd', {}, [
+              'Does *not* work **very** well. Use HTML ',
+              [ 'em', {}, [ 'tags' ] ],
+              '.' ] ]
+          ] ]
+        ] ]
+      )
+    end
+
+    it 'ignores random angle brackets' do
 
       expect(js %q{
         return SaintMarc.parse(
@@ -118,15 +163,14 @@ describe 'SaintMarc' do
           '1 <7> 4\n' +
           '1 < 7 > 4\n')
       }).to eq(
-        [ 'doc', [
-          [ 'p', [
-            [ 'span', 'This is a ' ],
-            [ 'tag', '<a href="http://example.com/?a=b">' ],
-            [ 'span', 'link' ],
-            [ 'tag', '</a>' ],
-            [ 'span', '.' ],
-            [ 'span', "1 <7> 4\n1 < 7 > 4\n" ],
-          ] ]
+        [ 'doc', {}, [
+          [ 'p', {}, [
+            [ 'span', {}, 'This is a ' ] ],
+            [ 'a', { 'href' => 'http://example.com/?a=b' }, 'link' ],
+            [ 'span', {}, '.' ],
+            [ 'span', {}, '1 <7> 4' ],
+            [ 'span', {}, '1 < 7 > 4' ],
+          ]
         ] ]
       )
     end
@@ -135,12 +179,20 @@ describe 'SaintMarc' do
 
       {
 
-        #'*emphasis*' => [ 'em', [ 'emphasis' ] ],
-        '_emphasis_' => [ 'em', [ [ 'span', 'emphasis' ] ] ],
-        '**strong**' => [ 'strong', [ [ 'span', 'strong' ] ] ],
-        '__strong__' => [ 'strong', [ [ 'span', 'strong' ] ] ],
-        '~~strikethrough~~' => [ 'del', [ [ 'span', 'strikethrough' ] ] ],
-        '[here](http://x.com/here)' => [ 'a', [ 'here', 'http://x.com/here' ] ],
+        #'*emphasis*' =>
+        #  [ 'em', [ 'emphasis' ] ],
+        '_emphasis_' =>
+          [ 'em', [ [ 'span', 'emphasis' ] ] ],
+        '**strong**' =>
+          [ 'strong', [ [ 'span', 'strong' ] ] ],
+        '__strong__' =>
+          [ 'strong', [ [ 'span', 'strong' ] ] ],
+        '~~strikethrough~~' =>
+          [ 'del', [ [ 'span', 'strikethrough' ] ] ],
+        '[here](http://x.com/here)' =>
+          [ 'a', { 'href' => 'http://x.com/here' }, [ 'here' ] ],
+        'road_block' =>
+          [ 'FIXME' ],
 
       }.each do |k, v|
 
@@ -148,6 +200,7 @@ describe 'SaintMarc' do
 
           d = js "return SaintMarc.parse(#{k.inspect});"
 
+#pp d
           expect(d[1][0][1][0]).to eq(v)
         end
       end

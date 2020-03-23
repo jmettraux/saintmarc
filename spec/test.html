@@ -6,7 +6,7 @@
 
     <script src="h-1.2.0-028b4eb.min.js"></script>
 
-    <script src="jaabro.js"></script>
+    <script src="jaabro-1.2.0-f7f35ef.js"></script>
     <script src="../src/saintmarc.js"></script>
     <!--script src="helpers.js"></script-->
 
@@ -23,10 +23,16 @@
 
     <h2>in:</h2>
     <textarea id="in">
+This is our test.
+This is still the first paragraph.
+
+This is another paragraph.
+    </textarea>
+    <!--
+    <textarea id="in">
 1 &lt;7&gt; 4
 1 &lt; 7 &gt; 4
     </textarea>
-    <!--
     <textarea id="in">
 _emphasis_
     </textarea>
@@ -81,39 +87,24 @@ Click [here](http://example.com/).
     <script>
 
       var clog = console.log;
+      var cerr = console.error;
 
       var toPre = function(depth, tree, out) {
-
-        //try {
 
         var ind = ''; for (var i = 0; i < depth; i++) ind = ind + '  ';
         out = out + (depth === 0 ? '' : '\n') + ind;
 
-        if (typeof tree === 'string') {
+        out = out + tree[0];
 
-          out = out + JSON.stringify(tree);
+        for (var k in tree[1]) {
+          out = out + ' ' + k + ': ' + JSON.stringify(tree[1][k]);
+        }
+        if (typeof tree[2] === 'string') {
+          out = out + ' ' + JSON.stringify(tree[2]);
         }
         else {
-
-          out = out + tree[0];
-
-          for (var k in tree[1]) {
-            out = out + ' ' + k + ': ' + JSON.stringify(tree[1][k]);
-          }
-          if (
-            Object.keys(tree[1]).length < 1 &&
-            tree[2].length === 1 &&
-            (typeof tree[2][0]) === 'string'
-          ) {
-            out = out + ' ' + JSON.stringify(tree[2][0]);
-          }
-          else {
-            tree[2].forEach(function(tt) {
-              out = toPre(depth + 1, tt, out);
-            });
-          }
+          tree[2].forEach(function(tt) { out = toPre(depth + 1, tt, out); });
         }
-        //} catch(e) { console.error('toPre() intercepted', e); }
 
         return out;
       };
@@ -124,24 +115,36 @@ Click [here](http://example.com/).
 
         // #tree
         //
-        var t = SaintMarc.parse(s);
-        if (t) H.elt('#tree').textContent = toPre(0, t, '');
-        else H.create(H.elt('#tree'), 'em', {}, '(parsing failed)');
+        try {
+          var t = SaintMarc.parse(s);
+          H.elt('#tree').textContent = t ? toPre(0, t, '') : '(parsing failed)';
+        } catch(err) {
+          H.elt('#tree').textContent = '(parsing failed)';
+          cerr("SaintMarc.parse(s) failed...", err);
+        }
 
         // #out
         //
-        var e = SaintMarc.toHtml(s);
-        //clog(e);
         H.remove('#out > *');
-        if (e) H.elt('#out').appendChild(e);
-        else H.create(H.elt('#out'), 'em', {}, '(parsing failed)');
+        try {
+          var e = SaintMarc.toHtml(s);
+          //clog(e);
+          if (e) H.elt('#out').appendChild(e);
+          else H.create(H.elt('#out'), 'em', {}, '(parsing failed)');
+        } catch (err) { cerr("SaintMarc.toHtml(s) failed...", err); }
 
         // #parse-tree
         //
-        var t = SaintMarc.parse(s, { debug: 3 });
-        //clog(t);
         H.remove('#parse-tree > div');
-        H.elt('#parse-tree').appendChild(t.toHtml());
+        try {
+          var t = SaintMarc.parse(s, { debug: 3 });
+          //clog(t);
+          H.elt('#parse-tree').appendChild(t.toHtml());
+        } catch (err) {
+          H.elt('#parse-tree').textContent =
+            '(bad, debug parsing failed, this should not happen)';
+          cerr("SaintMarc debug parsing failed...", err);
+        }
 
         H.elts('.jaabro-extra')
           .forEach(function(e) { e.style.display = 'none'; });
@@ -149,7 +152,7 @@ Click [here](http://example.com/).
           .forEach(function(e) { e.style.display = 'none'; });
         try {
           H.elt('#parse-tree > .jaabro-failure').style.display = null;
-        } catch(e) {}
+        } catch (err) {}
 
         H.on('.jaabro-name', 'click', function(ev) {
           var t = ev.target.closest('.jaabro-tree');
