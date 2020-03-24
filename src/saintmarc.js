@@ -133,10 +133,10 @@ var SaintMarc = (function() {
     var n = null;
 
     function eol(i) { return rex(n, i, /\r?\n|$/); }
+    function blank_line(i) { return rex(n, i, /[\s\t]*(\r?\n|$)/); }
 
     function dot(i) { return str(n, i, '.'); }
     function ws(i) { return rex(n, i, /[ \t]/); }
-    function ulistar(i) { return rex(n, i, /[-*]/); }
 
     // line: content
 
@@ -146,34 +146,24 @@ var SaintMarc = (function() {
 
     function ind(i) { return rex('ind', i, /[ \t]+/); }
     function linum(i) { return rex('linum', i, /\d+/); }
+    function listar(i) { return rex('listar', i, /[-*]/); }
 
     function olli_head(i) { return seq(n, i, ind, '?', linum, dot, ws, '+'); }
-    function ulli_head(i) { return seq(n, i, ind, '?', ulistar, ws, '+'); }
+    function ulli_head(i) { return seq(n, i, ind, '?', listar, ws, '+'); }
 
-    function olli(i) { return seq('olli', i, olli_head, content, eol); }
-    function ulli(i) { return seq('ulli', i, ulli_head, content, eol); }
-    function indli(i) { return seq('indli', i, ind, content, eol); }
+    function listli_head(i) { return alt(n, i, olli_head, ulli_head, ind); }
 
-    function oli(i) { return alt(n, i, olli, indli); }
-    function uli(i) { return alt(n, i, ulli, indli); }
+    function listli(i) { return seq('listli', i, listli_head, content, eol); }
 
-    function olist(i) { return rep('olist', i, oli, 1); }
-    function ulist(i) { return rep('ulist', i, uli, 1); }
-
-    function list(i) { return alt(n, i, olist, ulist); }
+    function list(i) { return seq('list', i, listli, '+'); }
 
     // block: para
 
-    function list_head(i) { return alt(n, i, ind, olli_head, ulli_head); }
-
     function paraline(i) {
-      return seq('paraline', i, list_head, '!', content, eol); }
+      return seq('paraline', i, listli_head, '!', content, eol); }
 
     function para(i) {
       return seq('para', i, paraline, '+', blank_line); }
-
-    function blank_line(i) {
-      return rex(n, i, /[\s\t]*(\r?\n|$)/); }
 
     // root
 
@@ -282,15 +272,109 @@ var SaintMarc = (function() {
 
     // line: content
 
-    function rewrite_content(t) { return [ 'span', {}, t.string() ]; } // FIXME
+    function rewrite_content(t) { return [ 'span', {}, t.string() ]; }
+      // FIXME
 
     // block: lists
 
-    function rewrite_ulli(t) { return [ 'li', {}, rwcn(t) ]; }
-    function rewrite_olli(t) { return [ 'li', {}, rwcn(t, 'content') ]; }
+    function rewrite_list(t) {
 
-    function rewrite_ulist(t) { return [ 'ul', {}, rwcn(t) ]; }
-    function rewrite_olist(t) { return [ 'ol', {}, rwcn(t) ]; }
+      var lis = [];
+        // << [ head, content ]
+
+      // first pass, determine indentation and type for each list item
+
+      t.subgather('listli').forEach(function(tt) {
+
+        var i = tt.lookup('ind'); i = i ? i.string() : '';
+        var h = tt.lookup('linum') || tt.lookup('listar');
+
+        if (h) {
+          h = i + (h.string().match(/^\d/) ? '1' : '*');
+        }
+        else {
+          var p = lis.find(function(e) {
+            return e[0].length + 1 === i.length; });
+          h = p ? p[0] : null;
+if ( ! h) throw ("loose list item");
+        }
+
+        lis.unshift([ h, rewrite(tt.lookup('content')) ]);
+      });
+
+        // sample content for `lis`:
+        //
+      // ["  1", ["span", {}, "john"]],
+      // ["*", ["span", {}, "immanuel"]],
+      // ["  *", ["span", {}, "heinrich"]],
+      // ["  *", ["span", {}, "gustav"]],
+      // ["    1", ["span", {}, "friedrich"]],
+      // ["    1", ["span", {}, "eric"]],
+      // ["  *", ["span", {}, "david"]],
+      // ["  *", ["span", {}, "charles"]],
+      // ["*", ["span", {}, "bob"]],
+      // ["*", ["span", {}, "alice"]]]]]
+
+      // second pass, gather list items into lists
+
+      var lists = [];
+      var lastlist = null;
+
+      while (true) {
+
+        var i = lis.pop(); if ( ! i) break;
+        var h = i[0]; var c = i[1];
+
+        if (lists.length < 1) {
+          var list = [ h.indexOf('*') > -1 ? 'ul' : 'ol', {}, [] ];
+          list[2].push([ 'li', {}, [ c ] ]);
+          list._head = h;
+          lastlist = list;
+          lists.push(list);
+          continue;
+        }
+
+        if (h === lastlist._head) {
+          lastlist[2].push([ 'li', {}, [ c ] ]);
+          continue;
+        }
+
+        if (h.length > lastlist._head.length) {
+          var list = [ h.indexOf('*') > -1 ? 'ul' : 'ol', {}, [] ];
+          list[2].push([ 'li', {}, [ c ] ]);
+          list._head = h;
+          lastlist[2].push([ 'li', {},  [ list ] ]);
+          lastlist = list;
+          continue;
+        }
+
+        // add to list upstream, so find it...
+
+        var findList = function(root) {
+          if (root._head === h) return root;
+          if ( ! Array.isArray(root[2])) return null;
+          for (var i = 0, l = root[2].length; i < l; i++) {
+            var c = root[2][i]; //if (c[0] !== 'li') continue;
+            r = findList(c); if (r) return r;
+          }
+          return null;
+        };
+
+        var ll = findList(lists[lists.length - 1]);
+
+        if (ll) {
+          ll[2].push([ 'li', {}, [ c ] ]);
+          lastlist = ll;
+        }
+        else {
+          lists.unshift(
+            [ 'div', { class: 'container-list-not-found', x: h }, [ c ] ]);
+              // keep that around as a, well, safety....
+        }
+      }
+
+      return lists;
+    }
 
     // block: para
 

@@ -60,30 +60,92 @@ describe 'SaintMarc' do
         %{
 - Min 80% of portfolio in bonds in the "Financial" sector according to Bloomberg "Industry Sector" classification and US Treasuries.
 - Credit rating must be Investment Grade (IG) at point of [purchase](https://www.example.com/nada).
-- Max 20% of portfolio in non-IG bonds (if any downgrades after purchase) allowed with min Ba4/BB-/BB- rating.
+  - Max 20% of portfolio in non-IG bonds (if any downgrades after purchase) allowed with min Ba4/BB-/BB- rating.
+    * a
+      y
         }.strip + "\n"
       t =
         js "return SaintMarc.parse(#{s.inspect});"
 
       expect(t).to eq(
-        [ "doc", {}, [
-          [ "ul", {}, [
-            [ "li", {}, [
-              [ "span", {}, [
-                "Min 80% of portfolio in bonds in the \"Financial\" sector " +
-                "according to Bloomberg \"Industry Sector\" classification " +
-                "and US Treasuries." ] ] ] ],
-            [ "li", {}, [
-              [ "span", {},
-                "Credit rating must be Investment Grade (IG) at point of " ],
-              [ "a", { "href" => "https://www.example.com/nada" }, [
-                "purchase" ] ],
-              [ "span", {}, [ "." ] ] ] ],
-            [ "li", {}, [
-              [ "span", {},
-                "Max 20% of portfolio in non-IG bonds (if any downgrades " +
-                "after purchase) allowed with min Ba4/BB-/BB- rating." ] ] ]
-            ] ] ] ])
+        ["doc",
+         {},
+         [[["ul",
+            {},
+            [["li",
+              {},
+              [["span",
+                {},
+                "Min 80% of portfolio in bonds in the \"Financial\" " +
+                "sector according to Bloomberg \"Industry Sector\" " +
+                "classification and US Treasuries."]]],
+             ["li",
+              {},
+              [["span",
+                {},
+                "Credit rating must be Investment Grade (IG) at point of " +
+                "[purchase](https://www.example.com/nada)."]]],
+             ["li",
+              {},
+              [["ul",
+                {},
+                [["li",
+                  {},
+                  [["span",
+                    {},
+                    "Max 20% of portfolio in non-IG bonds (if any downgrades " +
+                    "after purchase) allowed with min Ba4/BB-/BB- rating."]]],
+                 ["li",
+                  {},
+                  [["ul",
+                    {},
+                    [["li", {}, [["span", {}, "a"]]],
+                     ["li", {}, [["span", {}, "y"]]]]]]]]]]]]]]]]
+      )
+    end
+
+    it 'parses mixed lists' do
+
+      s =
+        %{
+- alice
+- bob
+  * charles
+  * david
+    1. eric
+    2. friedrich
+    gustav
+  * heinrich
+- immanuel
+  10. john
+        }.strip + "\n"
+      t =
+        js "return SaintMarc.parse(#{s.inspect});"
+
+      expect(t).to eq(
+        ["doc",
+         {},
+         [[["ul",
+            {},
+            [["li", {}, [["span", {}, "alice"]]],
+             ["li", {}, [["span", {}, "bob"]]],
+             ["li",
+              {},
+              [["ul",
+                {},
+                [["li", {}, [["span", {}, "charles"]]],
+                 ["li", {}, [["span", {}, "david"]]],
+                 ["li",
+                  {},
+                  [["ol",
+                    {},
+                    [["li", {}, [["span", {}, "eric"]]],
+                     ["li", {}, [["span", {}, "friedrich"]]]]]]],
+                 ["li", {}, [["span", {}, "gustav"]]],
+                 ["li", {}, [["span", {}, "heinrich"]]]]]]],
+             ["li", {}, [["span", {}, "immanuel"]]],
+             ["li", {}, [["ol", {}, [["li", {}, [["span", {}, "john"]]]]]]]]]]]]
+      )
     end
 
     it 'wraps inline HTML' do
