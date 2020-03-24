@@ -136,13 +136,13 @@ Click [here](http://example.com/).
 
         // #tree
         //
-        try {
+        //try {
           var t = SaintMarc.parse(s);
           H.elt('#tree').textContent = t ? toPre(0, t, '') : '(parsing failed)';
-        } catch(err) {
-          H.elt('#tree').textContent = '(parsing failed)';
-          cerr("SaintMarc.parse(s) failed...", err);
-        }
+        //} catch(err) {
+        //  H.elt('#tree').textContent = '(parsing failed)';
+        //  cerr("SaintMarc.parse(s) failed...", err);
+        //}
 
         // #out
         //

@@ -54,10 +54,6 @@ var SaintMarc = (function() {
 //    //  ); }
 //    function text(i) { return rex('text', i, /[^\r\n<*_~[]+/); }
 //
-//    function startab(i) { return str(null, i, '<'); }
-//    function endab(i) { return str(null, i, '>'); }
-//    function slash(i) { return str(null, i, '/'); }
-//
 //    function startb(i) { return str(null, i, '['); }
 //    function endb(i) { return str(null, i, ']'); }
 //    function startp(i) { return str(null, i, '('); }
@@ -138,9 +134,51 @@ var SaintMarc = (function() {
     function dot(i) { return str(n, i, '.'); }
     function ws(i) { return rex(n, i, /[ \t]/); }
 
-    // line: content
+    // html:
 
-    function content(i) { return rex('content', i, /[^\r\n$]+/); } // FIXME
+    function startab(i) { return str(null, i, '<'); }
+    function endab(i) { return str(null, i, '>'); }
+    function slash(i) { return str(null, i, '/'); }
+
+    function htavv(i) { return rex('htavv', i, /"([^"]|\\")*"|'([^']|\\')*'/); }
+    function htavq(i) { return rex(null, i, /\s*=\s*/); }
+    function htak(i) { return rex('htak', i, /[a-zA-z][-a-zA-Z0-9]*/); }
+    function htav(i) { return seq(null, i, htavq, htavv); }
+    function htaa(i) { return rex(null, i, /\s+/); }
+    function hta(i) { return seq('hta', i, htaa, htak, htav, '?'); }
+
+    function htag(i) { return rex('htag', i, /[a-zA-Z][-a-zA-Z0-9]*/); }
+
+    function htxt(i) { return rex('htxt', i, /[^<]+/); }
+
+    function hbody(i) { return alt('hbody', i, htxt, html); }
+
+    function ochtml(i) {
+      return seq(
+        null, i,
+        startab, htag, hta, '*', endab,
+        hbody, '*',
+        startab, slash, htag, endab); }
+    function lhtml(i) {
+      return seq(
+        null, i,
+        startab, htag, hta, '*', endab); }
+    function chtml(i) {
+      return seq(
+        null, i,
+        startab, htag, hta, '*', slash, endab); }
+
+    function html(i) { return alt('html', i, chtml, ochtml, lhtml); }
+
+    // inline:
+
+    function inplain(i) { return rex('inplain', i, /[^\r\n$]+/); }
+    function inhtml(i) { return ren('inhtml', i, html); }
+
+    function inelt(i) { return alt('inelt', i, inhtml, inplain); }
+
+    //function inline(i) { return rex('inline', i, /[^\r\n$]+/); } // FIXME
+    function inline(i) { return rep('inline', i, inelt, 1); }
 
     // block: lists
 
@@ -153,14 +191,14 @@ var SaintMarc = (function() {
 
     function listli_head(i) { return alt(n, i, olli_head, ulli_head, ind); }
 
-    function listli(i) { return seq('listli', i, listli_head, content, eol); }
+    function listli(i) { return seq('listli', i, listli_head, inline, eol); }
 
     function list(i) { return seq('list', i, listli, '+'); }
 
     // block: para
 
     function paraline(i) {
-      return seq('paraline', i, listli_head, '!', content, eol); }
+      return seq('paraline', i, listli_head, '!', inline, eol); }
 
     function para(i) {
       return seq('para', i, paraline, '+', blank_line); }
@@ -185,9 +223,9 @@ var SaintMarc = (function() {
       return t ? t.subgather(arguments[1]).map(rewrite) : [];
     }
 
-    // line: content
+    // inline
 
-    function rewrite_content(t) { return [ 'p', {}, t.string() ]; }
+    function rewrite_inline(t) { return [ 'p', {}, t.string() ]; }
       // FIXME
 
     // block: lists
@@ -214,7 +252,7 @@ var SaintMarc = (function() {
 if ( ! h) throw ("loose list item");
         }
 
-        lis.unshift([ h, rewrite(tt.lookup('content')) ]);
+        lis.unshift([ h, rewrite(tt.lookup('inline')) ]);
       });
 
         // sample content for `lis`:
@@ -288,7 +326,7 @@ if ( ! h) throw ("loose list item");
         }
       }
 
-      return lists;
+      return lists.pop();
     }
 
     // block: para
