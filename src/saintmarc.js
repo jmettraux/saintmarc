@@ -184,91 +184,6 @@ var SaintMarc = (function() {
 
       return t ? t.subgather(arguments[1]).map(rewrite) : [];
     }
-//    function rwcn(t) {
-//      if ( ! t) return [];
-//      var a = [];
-//      var pe = null;
-//      t.subgather(null).forEach(function(ct) {
-//        var ce = rewrite(ct);
-////clog(pe, ce);
-//        var ce2 = ce[0] === 'span' && Object.keys(ce[1]).length < 1 && ce[2];
-//        //a.push(ce);
-//        if (pe && ce2) {
-//          //pe[2] = pe[2] + ce2;
-//          pe[2] = [ pe[2][0] + ce2[0] ];
-//        }
-//        else {
-//          pe = ce2 ? ce : null;
-//          a.push(ce);
-//        }
-//      });
-//      return a;
-//    }
-//      // gather named children and rewrite them
-
-////    function rewrite_del(t) { return [ 'del', {}, rwcn(t) ]; }
-//    function rewrite_em(t) { return [ 'em', {}, rwcn(t) ]; }
-//    function rewrite_strong(t) { return [ 'strong', {}, rwcn(t) ]; }
-//
-//    function rewrite_hr(t) { return [ 'hr', {}, [] ]; }
-//
-//    function rewrite_htxt(t) { return t.string(); }
-//
-//    function rewrite_hbodies(t) {
-//
-//      var es = t.gather('hbody')
-//        .map(function(tt) { return rewrite(tt.sublookup(null)); });
-//
-//      var hes = []; var tes = [];
-//      es.forEach(
-//        function(e) { (((typeof e) === 'string') ? tes : hes).push(e); });
-//
-//      if (tes.every(function(te) { return te.trim().length < 1; })) return hes;
-//      return es;
-//    }
-//
-//    function rewrite_hats(t) {
-//      return t.gather('hta')
-//        .reduce(
-//          function(r, a) {
-//            var v = t.lookup('htavv');
-//            if (v) { v = v.string(); v = v.substring(1, v.length - 1); }
-//            else { v = true; }
-//            r[t.lookup('htak').string()] = v;
-//            return r; },
-//          {});
-//    }
-//
-//    function rewrite_html(t) {
-//      return [
-//        t.lookup('htag').string(), rewrite_hats(t), rewrite_hbodies(t) ];
-//    }
-//
-//    function rewrite_link(t) {
-//      return [
-//        'a',
-//        { href: t.lookup('lhref').string() },
-//        [ t.lookup('ltext').string() ] ]; }
-//
-//    var rewrite_ull = rwcn;
-//    var rewrite_oll = rwcn;
-//
-//    function rewrite_text(t) { return [ 'span', {}, [ t.string() ] ] }
-//
-//    var rewrite_pl = rwcn;
-//
-//    var flatten = function(a) {
-//      var r = []; a.forEach(function(e) { r = r.concat(e); }); return r;
-//    };
-//
-//    function rewrite_p(t) { return [ 'p', {}, flatten(rwcn(t)) ]; }
-//
-//    function rewrite_ol(t) {
-//      return [
-//        'ol', {}, rwcn(t).map(function(c) { return [ 'li', {}, c ]; }) ]; }
-//    function rewrite_ul(t) {
-//      return [
-//        'ul', {}, rwcn(t).map(function(c) { return [ 'li', {}, c ]; }) ]; }
 
     // line: content
 
@@ -384,6 +299,7 @@ if ( ! h) throw ("loose list item");
     // root
 
     function rewrite_doc(t) { return [ 'doc', {}, rwcn(t) ]; }
+
   }); // end Parser
 
   //
