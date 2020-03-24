@@ -272,7 +272,7 @@ var SaintMarc = (function() {
 
     // line: content
 
-    function rewrite_content(t) { return [ 'span', {}, t.string() ]; }
+    function rewrite_content(t) { return [ 'p', {}, t.string() ]; }
       // FIXME
 
     // block: lists
@@ -304,16 +304,16 @@ if ( ! h) throw ("loose list item");
 
         // sample content for `lis`:
         //
-      // ["  1", ["span", {}, "john"]],
-      // ["*", ["span", {}, "immanuel"]],
-      // ["  *", ["span", {}, "heinrich"]],
-      // ["  *", ["span", {}, "gustav"]],
-      // ["    1", ["span", {}, "friedrich"]],
-      // ["    1", ["span", {}, "eric"]],
-      // ["  *", ["span", {}, "david"]],
-      // ["  *", ["span", {}, "charles"]],
-      // ["*", ["span", {}, "bob"]],
-      // ["*", ["span", {}, "alice"]]]]]
+      // ["  1", ["p", {}, "john"]],
+      // ["*", ["p", {}, "immanuel"]],
+      // ["  *", ["p", {}, "heinrich"]],
+      // ["  *", ["p", {}, "gustav"]],
+      // ["    1", ["p", {}, "friedrich"]],
+      // ["    1", ["p", {}, "eric"]],
+      // ["  *", ["p", {}, "david"]],
+      // ["  *", ["p", {}, "charles"]],
+      // ["*", ["p", {}, "bob"]],
+      // ["*", ["p", {}, "alice"]]]]]
 
       // second pass, gather list items into lists
 

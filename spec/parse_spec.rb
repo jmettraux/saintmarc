@@ -74,14 +74,14 @@ describe 'SaintMarc' do
             {},
             [["li",
               {},
-              [["span",
+              [["p",
                 {},
                 "Min 80% of portfolio in bonds in the \"Financial\" " +
                 "sector according to Bloomberg \"Industry Sector\" " +
                 "classification and US Treasuries."]]],
              ["li",
               {},
-              [["span",
+              [["p",
                 {},
                 "Credit rating must be Investment Grade (IG) at point of " +
                 "[purchase](https://www.example.com/nada)."]]],
@@ -91,7 +91,7 @@ describe 'SaintMarc' do
                 {},
                 [["li",
                   {},
-                  [["span",
+                  [["p",
                     {},
                     "Max 20% of portfolio in non-IG bonds (if any downgrades " +
                     "after purchase) allowed with min Ba4/BB-/BB- rating."]]],
@@ -99,8 +99,8 @@ describe 'SaintMarc' do
                   {},
                   [["ul",
                     {},
-                    [["li", {}, [["span", {}, "a"]]],
-                     ["li", {}, [["span", {}, "y"]]]]]]]]]]]]]]]]
+                    [["li", {}, [["p", {}, "a"]]],
+                     ["li", {}, [["p", {}, "y"]]]]]]]]]]]]]]]]
       )
     end
 
@@ -127,24 +127,24 @@ describe 'SaintMarc' do
          {},
          [[["ul",
             {},
-            [["li", {}, [["span", {}, "alice"]]],
-             ["li", {}, [["span", {}, "bob"]]],
+            [["li", {}, [["p", {}, "alice"]]],
+             ["li", {}, [["p", {}, "bob"]]],
              ["li",
               {},
               [["ul",
                 {},
-                [["li", {}, [["span", {}, "charles"]]],
-                 ["li", {}, [["span", {}, "david"]]],
+                [["li", {}, [["p", {}, "charles"]]],
+                 ["li", {}, [["p", {}, "david"]]],
                  ["li",
                   {},
                   [["ol",
                     {},
-                    [["li", {}, [["span", {}, "eric"]]],
-                     ["li", {}, [["span", {}, "friedrich"]]]]]]],
-                 ["li", {}, [["span", {}, "gustav"]]],
-                 ["li", {}, [["span", {}, "heinrich"]]]]]]],
-             ["li", {}, [["span", {}, "immanuel"]]],
-             ["li", {}, [["ol", {}, [["li", {}, [["span", {}, "john"]]]]]]]]]]]]
+                    [["li", {}, [["p", {}, "eric"]]],
+                     ["li", {}, [["p", {}, "friedrich"]]]]]]],
+                 ["li", {}, [["p", {}, "gustav"]]],
+                 ["li", {}, [["p", {}, "heinrich"]]]]]]],
+             ["li", {}, [["p", {}, "immanuel"]]],
+             ["li", {}, [["ol", {}, [["li", {}, [["p", {}, "john"]]]]]]]]]]]]
       )
     end
 
