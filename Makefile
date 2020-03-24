@@ -1,5 +1,6 @@
 
 N:=saintmarc
+LICENSE:=https://github.com/jmettraux/$(N)/LICENSE.txt
 
 VERSION:=$(shell grep VERSION src/$(N).js | ruby -e "puts gets.match(/VERSION = '([\d\.]+)/)[1]")
 
@@ -22,14 +23,14 @@ pkg_plain:
 
 pkg_mini:
 	mkdir -p pkg
-	printf "/* $(N)-$(VERSION).min.js | MIT license: http://github.com/jmettraux/$(N).js/LICENSE.txt */" > pkg/$(N)-$(VERSION).min.js
+	printf "/* $(N)-$(VERSION).min.js | MIT license: $(LICENSE) */" > pkg/$(N)-$(VERSION).min.js
 	java -jar tools/closure-compiler.jar --js src/$(N).js >> pkg/$(N)-$(VERSION).min.js
 	echo "/* minified from commit $(SHA) on $(NOW) */" >> pkg/$(N)-$(VERSION).min.js
 	cp pkg/$(N)-$(VERSION).min.js pkg/$(N)-$(VERSION)-$(SHA).min.js
 
 pkg_comp:
 	mkdir -p pkg
-	printf "/* $(N)-$(VERSION).com.js | MIT license: http://github.com/jmettraux/$(N).js/LICENSE.txt */\n" > pkg/$(N)-$(VERSION).com.js
+	printf "/* $(N)-$(VERSION).com.js | MIT license: $(LICENSE) */\n" > pkg/$(N)-$(VERSION).com.js
 	cat src/$(N).js | ruby tools/compactor.rb >> pkg/$(N)-$(VERSION).com.js
 	echo "\n/* compacted from commit $(SHA) on $(NOW) */" >> pkg/$(N)-$(VERSION).com.js
 	cp pkg/$(N)-$(VERSION).com.js pkg/$(N)-$(VERSION)-$(SHA).com.js
