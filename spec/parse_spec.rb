@@ -137,30 +137,31 @@ describe 'SaintMarc' do
       t =
         js "return SaintMarc.parse(#{s.inspect});"
 
-pp t
       expect(t).to eq(
         ["doc",
          {},
          [["ul",
            {},
            [["li", {}, [["p", {}, "alice"]]],
-            ["li", {}, [["p", {}, "bob"]]],
             ["li",
              {},
-             [["ul",
+             [["p", {}, "bob"],
+              ["ul",
                {},
                [["li", {}, [["p", {}, "charles"]]],
-                ["li", {}, [["p", {}, "david"]]],
                 ["li",
                  {},
-                 [["ol",
+                 [["p", {}, "david"],
+                  ["ol",
                    {},
                    [["li", {}, [["p", {}, "eric"]]],
-                    ["li", {}, [["p", {}, "friedrich"]]]]]]],
-                ["li", {}, [["p", {}, "gustav"]]],
+                    ["li", {}, [["p", {}, "friedrich"]]]]],
+                  ["p", {}, "gustav"]]],
                 ["li", {}, [["p", {}, "heinrich"]]]]]]],
-            ["li", {}, [["p", {}, "immanuel"]]],
-            ["li", {}, [["ol", {}, [["li", {}, [["p", {}, "john"]]]]]]]]]]]
+            ["li",
+             {},
+             [["p", {}, "immanuel"],
+              ["ol", {}, [["li", {}, [["p", {}, "john"]]]]]]]]]]]
       )
     end
 

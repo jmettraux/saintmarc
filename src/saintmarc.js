@@ -253,10 +253,10 @@ var SaintMarc = (function() {
           h = p ? p[0].replace(/[^ ]/g, ' ') : i;
         }
 
-        lis.unshift([ h, rewrite(tt.lookup('inline')) ]);
+        lis.unshift([ h.replace(/ /g, '.'), rewrite(tt.lookup('inline')) ]);
       });
 
-clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
+//clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
         // sample content for `lis`:
         //
       // - min thing
@@ -275,6 +275,7 @@ clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
 
       // second pass, gather list items into lists
 
+      var root = null;
       var lists = [];
       var lastlist = null;
 
@@ -288,21 +289,25 @@ clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
           var list = [ h.indexOf('*') > -1 ? 'ul' : 'ol', {}, [] ];
           list._head = h;
           list[2].push([ 'li', {}, [ c ] ]);
-          return list;
-        };
+          lists.unshift(list);
+          return list; };
         var addToLi = function(/* something_or_c */) {
           var cn = lastlist[2];
           var li = cn[cn.length - 1];
           li[2].push(arguments[0] || c);
-          return li;
-        };
+          return li; };
+        var addLi = function() {
+          var cn = lastlist[2];
+          var li = [ 'li', {}, [ c ] ];
+          cn.push(li);
+          return li; };
 
         // first the two easy cases...
 
-        if (lists.length < 1) { // add first `ul` or `ol`
+        if ( ! root) { // add first `ul` or `ol`
           var list = makeList();
           lastlist = list;
-          lists.push(list);
+          root = list;
           continue;
         }
 
@@ -313,7 +318,7 @@ clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
 
         // easy sub cases then...
 
-        var sub = ! h.match(/[^ ]/);
+        var sub = ! h.match(/[^\.]/);
 
         if (sub && h.length >= lastlist._head.length) { // add `p` to `li`
           addToLi(c);
@@ -327,45 +332,30 @@ clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
           continue;
         }
 
-clog([ lastlist._head, '<--', h, JSON.stringify(c) ]);
-//clog(lastlist._head, '<--', h, sub, c, '?', h.length, lastlist._head.length);
-//
-//        if (h.length > lastlist._head.length) { // add new `ul` or `ol`
-//          var list = [ h.indexOf('*') > -1 ? 'ul' : 'ol', {}, [] ];
-//          list[2].push([ 'li', {}, [ c ] ]);
-//          list._head = h;
-//          lastlist[2].push([ 'li', {},  [ list ] ]);
-//          lastlist = list;
-//          continue;
-//        }
+c//log([ lastlist._head, '<--', h, JSON.stringify(c) ]);
 
         // add to list upstream, so find it...
 
-//        var findList = function(root) {
-//          if (root._head === h) return root;
-//          if ( ! Array.isArray(root[2])) return null;
-//          for (var i = 0, l = root[2].length; i < l; i++) {
-//            var c = root[2][i];
-//            r = findList(c); if (r) return r;
-//          }
-//          return null;
-//        };
-//        var ll = findList(lists[lists.length - 1]);
-//
-//        if (ll) {
-//          ll[2].push([ 'li', {}, [ c ] ]);
-//          lastlist = ll;
-//        }
-//        else {
-//          lists.unshift(
-//            [ 'div', { 'class': 'container-list-not-found', x: h }, [ c ] ]);
-//              // keep that around as a, well, safety....
-//        }
+//clog('"' + h + '" ' + JSON.stringify(c));
+//clog(lists.map(function(l) {
+//  return '"' + l._head + '" ' + JSON.stringify(l);
+//}).join('\n'));
+        var list = null;
+        for (var j = 0, l = lists.length; j < l; j++) {
+          list = lists[j];
+          if (list._head.length > h.length) continue;
+//clog('"' + list._head + '" -- ' + JSON.stringify(list));
+          if (sub && list._head.length === h.length) break;
+          if (list._head.length === h.length) break;
+          //list = null; // reset... NO, stay with the root list...
+        }
+//clog('found', list);
+        lastlist = list;
+        if (sub) addToLi(c);
+        else addLi(c);
       }
 
-clog(lists);
-//return lists;
-      return lists.pop();
+      return root;
     }
 
     // block: para
