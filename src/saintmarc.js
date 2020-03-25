@@ -294,26 +294,20 @@ var SaintMarc = (function() {
         var addToLi = function(/* something_or_c */) {
           var cn = lastlist[2];
           var li = cn[cn.length - 1];
-          li[2].push(arguments[0] || c);
-          return li; };
+          var el = arguments[0] || c;
+          li[2].push(el);
+          return el; };
         var addLi = function() {
-          var cn = lastlist[2];
-          var li = [ 'li', {}, [ c ] ];
-          cn.push(li);
-          return li; };
+          lastlist[2].push([ 'li', {}, [ c ] ]); };
 
         // first the two easy cases...
 
         if ( ! root) { // add first `ul` or `ol`
-          var list = makeList();
-          lastlist = list;
-          root = list;
-          continue;
+          lastlist = root = makeList(); continue;
         }
 
         if (h === lastlist._head) { // add `li` to `ul` or `ol`
-          lastlist[2].push([ 'li', {}, [ c ] ]);
-          continue;
+          addLi(); continue;
         }
 
         // easy sub cases then...
@@ -321,38 +315,27 @@ var SaintMarc = (function() {
         var sub = ! h.match(/[^\.]/);
 
         if (sub && h.length >= lastlist._head.length) { // add `p` to `li`
-          addToLi(c);
-          continue;
+          addToLi(); continue;
         }
 
-        if (h.length >= lastlist._head.length) { // add ul/ol to li
-          var list = makeList();
-          addToLi(list);
-          lastlist = list;
-          continue;
+        if (h.length >= lastlist._head.length) { // add `ul` or `ol` to `li`
+          lastlist = addToLi(makeList()); continue;
         }
-
-c//log([ lastlist._head, '<--', h, JSON.stringify(c) ]);
 
         // add to list upstream, so find it...
 
-//clog('"' + h + '" ' + JSON.stringify(c));
-//clog(lists.map(function(l) {
-//  return '"' + l._head + '" ' + JSON.stringify(l);
-//}).join('\n'));
         var list = null;
         for (var j = 0, l = lists.length; j < l; j++) {
           list = lists[j];
           if (list._head.length > h.length) continue;
-//clog('"' + list._head + '" -- ' + JSON.stringify(list));
           if (sub && list._head.length === h.length) break;
-          if (list._head.length === h.length) break;
           //list = null; // reset... NO, stay with the root list...
         }
-//clog('found', list);
+
         lastlist = list;
-        if (sub) addToLi(c);
-        else addLi(c);
+
+        if (sub) addToLi();
+        else addLi();
       }
 
       return root;
