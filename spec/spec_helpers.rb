@@ -14,6 +14,9 @@ module Helpers
   def js(s)
 
     File.open('spec/source.js', 'wb') do |f|
+
+      f.puts('function clog() {}; function cerr() {};')
+
       f.puts(File.read(Dir['spec/jaabro*.js'].last))
       f.puts(File.read('src/saintmarc.js'))
     end

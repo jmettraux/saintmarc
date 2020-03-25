@@ -248,25 +248,30 @@ var SaintMarc = (function() {
         else {
           var p = lis.find(function(e) {
             return e[0].length + 1 === i.length; });
-          h = p ? p[0] : null;
-if ( ! h) throw ("loose list item");
+          //h = p ? p[0].replace(/[^ ]/g, ' ') : null;
+//if ( ! h) throw ("loose list item");
+          h = p ? p[0].replace(/[^ ]/g, ' ') : i;
         }
 
         lis.unshift([ h, rewrite(tt.lookup('inline')) ]);
       });
 
+clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
         // sample content for `lis`:
         //
-      // ["  1", ["p", {}, "john"]],
-      // ["*", ["p", {}, "immanuel"]],
-      // ["  *", ["p", {}, "heinrich"]],
-      // ["  *", ["p", {}, "gustav"]],
-      // ["    1", ["p", {}, "friedrich"]],
-      // ["    1", ["p", {}, "eric"]],
-      // ["  *", ["p", {}, "david"]],
-      // ["  *", ["p", {}, "charles"]],
-      // ["*", ["p", {}, "bob"]],
-      // ["*", ["p", {}, "alice"]]]]]
+      // - min thing
+      // - credit rating
+      //   oh well
+      //   - max 20%
+      //     * alpha
+      //       bravo
+        //
+      // [["     ", ["p", {}, "bravo"]],
+      //  ["    *", ["p", {}, "alpha"]],
+      //  ["  *", ["p", {}, "max 20%"]],
+      //  [" ", ["p", {}, "oh well"]],
+      //  ["*", ["p", {}, "credit rating"]],
+      //  ["*", ["p", {}, "min thing"]]]]]
 
       // second pass, gather list items into lists
 
@@ -276,56 +281,90 @@ if ( ! h) throw ("loose list item");
       while (true) {
 
         var i = lis.pop(); if ( ! i) break;
-        var h = i[0]; var c = i[1];
 
-        if (lists.length < 1) {
+        var h = i[0], c = i[1];
+
+        var makeList = function() {
           var list = [ h.indexOf('*') > -1 ? 'ul' : 'ol', {}, [] ];
-          list[2].push([ 'li', {}, [ c ] ]);
           list._head = h;
+          list[2].push([ 'li', {}, [ c ] ]);
+          return list;
+        };
+        var addToLi = function(/* something_or_c */) {
+          var cn = lastlist[2];
+          var li = cn[cn.length - 1];
+          li[2].push(arguments[0] || c);
+          return li;
+        };
+
+        // first the two easy cases...
+
+        if (lists.length < 1) { // add first `ul` or `ol`
+          var list = makeList();
           lastlist = list;
           lists.push(list);
           continue;
         }
 
-        if (h === lastlist._head) {
+        if (h === lastlist._head) { // add `li` to `ul` or `ol`
           lastlist[2].push([ 'li', {}, [ c ] ]);
           continue;
         }
 
-        if (h.length > lastlist._head.length) {
-          var list = [ h.indexOf('*') > -1 ? 'ul' : 'ol', {}, [] ];
-          list[2].push([ 'li', {}, [ c ] ]);
-          list._head = h;
-          lastlist[2].push([ 'li', {},  [ list ] ]);
+        // easy sub cases then...
+
+        var sub = ! h.match(/[^ ]/);
+
+        if (sub && h.length >= lastlist._head.length) { // add `p` to `li`
+          addToLi(c);
+          continue;
+        }
+
+        if (h.length >= lastlist._head.length) { // add ul/ol to li
+          var list = makeList();
+          addToLi(list);
           lastlist = list;
           continue;
         }
 
+clog([ lastlist._head, '<--', h, JSON.stringify(c) ]);
+//clog(lastlist._head, '<--', h, sub, c, '?', h.length, lastlist._head.length);
+//
+//        if (h.length > lastlist._head.length) { // add new `ul` or `ol`
+//          var list = [ h.indexOf('*') > -1 ? 'ul' : 'ol', {}, [] ];
+//          list[2].push([ 'li', {}, [ c ] ]);
+//          list._head = h;
+//          lastlist[2].push([ 'li', {},  [ list ] ]);
+//          lastlist = list;
+//          continue;
+//        }
+
         // add to list upstream, so find it...
 
-        var findList = function(root) {
-          if (root._head === h) return root;
-          if ( ! Array.isArray(root[2])) return null;
-          for (var i = 0, l = root[2].length; i < l; i++) {
-            var c = root[2][i]; //if (c[0] !== 'li') continue;
-            r = findList(c); if (r) return r;
-          }
-          return null;
-        };
-
-        var ll = findList(lists[lists.length - 1]);
-
-        if (ll) {
-          ll[2].push([ 'li', {}, [ c ] ]);
-          lastlist = ll;
-        }
-        else {
-          lists.unshift(
-            [ 'div', { class: 'container-list-not-found', x: h }, [ c ] ]);
-              // keep that around as a, well, safety....
-        }
+//        var findList = function(root) {
+//          if (root._head === h) return root;
+//          if ( ! Array.isArray(root[2])) return null;
+//          for (var i = 0, l = root[2].length; i < l; i++) {
+//            var c = root[2][i];
+//            r = findList(c); if (r) return r;
+//          }
+//          return null;
+//        };
+//        var ll = findList(lists[lists.length - 1]);
+//
+//        if (ll) {
+//          ll[2].push([ 'li', {}, [ c ] ]);
+//          lastlist = ll;
+//        }
+//        else {
+//          lists.unshift(
+//            [ 'div', { 'class': 'container-list-not-found', x: h }, [ c ] ]);
+//              // keep that around as a, well, safety....
+//        }
       }
 
+clog(lists);
+//return lists;
       return lists.pop();
     }
 

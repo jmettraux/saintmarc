@@ -60,9 +60,10 @@ describe 'SaintMarc' do
         %{
 - Min 80% of portfolio in bonds in the "Financial" sector according to Bloomberg "Industry Sector" classification and US Treasuries.
 - Credit rating must be Investment Grade (IG) at point of [purchase](https://www.example.com/nada).
+  oh well
   - Max 20% of portfolio in non-IG bonds (if any downgrades after purchase) allowed with min Ba4/BB-/BB- rating.
-    * a
-      y
+    * alpha
+      bravo
         }.strip + "\n"
       t =
         js "return SaintMarc.parse(#{s.inspect});"
@@ -76,31 +77,45 @@ describe 'SaintMarc' do
              {},
              [["p",
                {},
-               "Min 80% of portfolio in bonds in the \"Financial\" " +
-               "sector according to Bloomberg \"Industry Sector\" " +
-               "classification and US Treasuries."]]],
+               "Min 80% of portfolio in bonds in the \"Financial\" sector according to Bloomberg \"Industry Sector\" classification and US Treasuries."]]],
             ["li",
              {},
              [["p",
                {},
-               "Credit rating must be Investment Grade (IG) at point of " +
-               "[purchase](https://www.example.com/nada)."]]],
-            ["li",
-             {},
-             [["ul",
+               "Credit rating must be Investment Grade (IG) at point of [purchase](https://www.example.com/nada)."],
+              ["p", {}, "oh well"],
+              ["ul",
                {},
                [["li",
                  {},
                  [["p",
                    {},
-                   "Max 20% of portfolio in non-IG bonds (if any downgrades " +
-                   "after purchase) allowed with min Ba4/BB-/BB- rating."]]],
-                ["li",
-                 {},
-                 [["ul",
+                   "Max 20% of portfolio in non-IG bonds (if any downgrades after purchase) allowed with min Ba4/BB-/BB- rating."],
+                  ["ul",
                    {},
-                   [["li", {}, [["p", {}, "a"]]],
-                    ["li", {}, [["p", {}, "y"]]]]]]]]]]]]]]]
+                   [["li", {}, [["p", {}, "alpha"], ["p", {}, "bravo"]]]]]]]]]]]]]]]
+      )
+    end
+
+    it 'parses lists with multiple paragraphs' do
+      s =
+        %{
+- first list item
+  also first list item
+- second list item
+        }.strip + "\n"
+      t =
+        js "return SaintMarc.parse(#{s.inspect});"
+
+      expect(t).to eq(
+        ["doc",
+         {},
+         [["ul",
+           {},
+           [["li", {}, [
+             ["p", {}, "first list item"],
+             ["p", {}, "also first list item"]]],
+            ["li", {}, [["p", {}, "second list item"]]]]]]]
       )
     end
 
@@ -122,6 +137,7 @@ describe 'SaintMarc' do
       t =
         js "return SaintMarc.parse(#{s.inspect});"
 
+pp t
       expect(t).to eq(
         ["doc",
          {},

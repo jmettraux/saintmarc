@@ -36,6 +36,14 @@
     </textarea>
     <!--
     <textarea id="in">
+- min thing
+- credit rating
+  oh well
+  - max 20%
+    * alpha
+      bravo
+    </textarea>
+    <textarea id="in">
 C'est mon premier paragraphe.
 
 1. un
@@ -136,13 +144,13 @@ Click [here](http://example.com/).
 
         // #tree
         //
-        //try {
+        try {
           var t = SaintMarc.parse(s);
           H.elt('#tree').textContent = t ? toPre(0, t, '') : '(parsing failed)';
-        //} catch(err) {
-        //  H.elt('#tree').textContent = '(parsing failed)';
-        //  cerr("SaintMarc.parse(s) failed...", err);
-        //}
+        } catch(err) {
+          H.elt('#tree').textContent = '(parsing failed)';
+          cerr("SaintMarc.parse(s) failed...", err);
+        }
 
         // #out
         //
