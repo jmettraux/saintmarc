@@ -2,7 +2,8 @@
 source 'https://rubygems.org'
 
 group :test do
-  gem 'rspec'
+  gem 'mini_racer'
   gem 'execjs'
+  gem 'rspec'
 end
 
