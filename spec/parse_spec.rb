@@ -165,6 +165,33 @@ describe 'SaintMarc' do
       )
     end
 
+    it 'manages lists followed by paragraphs' do
+
+      s =
+        %{
+1. alpha
+2. bravo
+
+It is followed by a paragraph.
+One on two lines.
+        }.strip + "\n"
+      t =
+        js "return SaintMarc.parse(#{s.inspect});"
+
+      expect(t).to eq(
+        ["doc",
+         {},
+         [["ol",
+           {},
+           [["li", {}, [
+            ["p", {}, "alpha"]]], ["li", {}, [["p", {}, "bravo"]]]]],
+          ["p",
+           {},
+           [["div", {}, "It is followed by a paragraph."],
+            ["div", {}, "One on two lines."]]]]]
+      )
+    end
+
     it 'wraps inline HTML' do
 
       expect(js %q{

@@ -193,7 +193,7 @@ var SaintMarc = (function() {
 
     function listli(i) { return seq('listli', i, listli_head, inline, eol); }
 
-    function list(i) { return seq('list', i, listli, '+'); }
+    function list(i) { return seq('list', i, listli, '+', blank_line); }
 
     // block: para
 
