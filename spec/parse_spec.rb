@@ -24,10 +24,12 @@ describe 'SaintMarc' do
     it 'parses a markdown string and returns a tree' do
 
       expect(js %q{
-        return SaintMarc.parse(
-          'This is our test\n' +
-          '\n' +
-          'This is another paragraph\n');
+        return SaintMarc
+          .parse(
+            'This is our test\n' +
+            '\n' +
+            'This is another paragraph\n')
+          .toArray();
       }).to eq(
         [ 'doc', {}, [
           [ 'p', {}, [ [ 'div', {}, 'This is our test' ] ] ],
@@ -42,7 +44,7 @@ describe 'SaintMarc' do
         "Max 20% of portfolio in non-IG bonds (if any downgrades after " +
         "purchase) allowed with min Ba4/BB-/BB- rating."
       t =
-        js "return SaintMarc.parse(#{s.inspect});"
+        js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
         [ "doc", {}, [
@@ -66,7 +68,7 @@ describe 'SaintMarc' do
       bravo
         }.strip + "\n"
       t =
-        js "return SaintMarc.parse(#{s.inspect});"
+        js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
         ["doc",
@@ -105,7 +107,7 @@ describe 'SaintMarc' do
 - second list item
         }.strip + "\n"
       t =
-        js "return SaintMarc.parse(#{s.inspect});"
+        js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
         ["doc",
@@ -135,7 +137,7 @@ describe 'SaintMarc' do
   10. john
         }.strip + "\n"
       t =
-        js "return SaintMarc.parse(#{s.inspect});"
+        js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
         ["doc",
@@ -176,7 +178,7 @@ It is followed by a paragraph.
 One on two lines.
         }.strip + "\n"
       t =
-        js "return SaintMarc.parse(#{s.inspect});"
+        js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
         ["doc",
@@ -202,7 +204,7 @@ A paragraph with two lines (divs).
 * a list
         }.strip + "\n"
       t =
-        js "return SaintMarc.parse(#{s.inspect});"
+        js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
         ["doc",

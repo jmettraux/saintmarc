@@ -42,8 +42,13 @@ Click [here](http://example.com/).
     <h2>tree:</h2>
     <pre id="tree"></pre>
 
-    <h2>out:</h2>
-    <div id="out"></div>
+    <h2>html out:</h2>
+    <div id="hout"></div>
+
+<!--
+    <h2>plain out:</h2>
+    <div id="pout"></div>
+-->
 
     <h2><span id="toggle-failure">parse</span> <span id="toggle-extra">tree</span>:</h2>
     <div id="parse-tree"></div>
@@ -87,15 +92,19 @@ Click [here](http://example.com/).
           cerr("SaintMarc.parse(s) failed...", err);
         }
 
-        // #out
+        // #hout
         //
-        H.remove('#out > *');
+        H.remove('#hout > *');
         try {
           var e = SaintMarc.toHtml(s);
           //clog(e);
-          if (e) H.elt('#out').appendChild(e);
-          else H.create(H.elt('#out'), 'em', {}, '(parsing failed)');
+          if (e) H.elt('#hout').appendChild(e);
+          else H.create(H.elt('#hout'), 'em', {}, '(parsing failed)');
         } catch (err) { cerr("SaintMarc.toHtml(s) failed...", err); }
+
+        // #pout
+        //
+        // TODO, maybe...
 
         // #parse-tree
         //

@@ -22,6 +22,57 @@
 // Made in Japan
 
 
+var SaintMarcNode = {
+
+  lastChild: function() {
+    if ( ! Array.isArray(this.children)) return undefined;
+    return this.children[this.children.length - 1];
+  },
+
+  push: function(child) {
+    this.children.push(child);
+    return child;
+  },
+
+  toArray: function(opts) {
+    var os = opts || {};
+    var r = [ this.tag, this.attributes ];
+    r.push(
+      Array.isArray(this.children) ?
+      this.children.map(function(c) { return c.toArray(); }) :
+      this.children);
+    return r;
+  },
+
+  //toHtml: function(opts) {
+  //  var os = opts || {};
+  //  var t0 = this.tag; if (t0 === 'doc') t0 = 'div';
+  //  var tc = ''; var cn = this.children;
+  //  if (typeof cn === 'string') { tc = cn; cn = []; }
+  //  var e = document.createElement(t0);
+  //  return e;
+  //},
+}; // end SaintMarcNode
+
+
+//  var toh = function(t, opts) {
+//
+//    var os = opts || {};
+//
+//
+//    var tc = '', cn = t[2];
+//    if (typeof cn === 'string') { tc = cn; cn = []; }
+//
+//    var e =
+//      os.parent ?
+//      H.create(opts.parent, t0, t[1], tc) :
+//      H.create(t0, t[1], tc);
+//    cn.forEach(function(ct) {
+//      os.parent = e; toh(ct, os); });
+//
+//    return e;
+//  };
+
 var SaintMarc = (function() {
 
   "use strict";
@@ -218,6 +269,14 @@ var SaintMarc = (function() {
     //
     // rewrite
 
+    var mk = function(tag, atts, children) {
+      var r = Object.create(SaintMarcNode);
+      r.tag = tag;
+      r.attributes = atts;
+      r.children = children || [];
+      return r;
+    };
+
     function rwcn(t/*, subname*/) {
 
       return t ? t.subgather(arguments[1]).map(rewrite) : [];
@@ -225,7 +284,7 @@ var SaintMarc = (function() {
 
     // inline
 
-    function rewrite_inline(t) { return [ 'p', {}, t.string() ]; }
+    function rewrite_inline(t) { return mk('p', {}, t.string()); }
       // FIXME
 
     // block: lists
@@ -286,19 +345,18 @@ var SaintMarc = (function() {
         var h = i[0], c = i[1];
 
         var makeList = function() {
-          var list = [ h.indexOf('*') > -1 ? 'ul' : 'ol', {}, [] ];
+          var list = mk(h.indexOf('*') > -1 ? 'ul' : 'ol', {}, []);
           list._head = h;
-          list[2].push([ 'li', {}, [ c ] ]);
+          list.push(mk('li', {}, [ c ]));
           lists.unshift(list);
           return list; };
         var addToLi = function(/* something_or_c */) {
-          var cn = lastlist[2];
-          var li = cn[cn.length - 1];
+          var li = lastlist.lastChild();
           var el = arguments[0] || c;
-          li[2].push(el);
+          li.push(el);
           return el; };
         var addLi = function() {
-          lastlist[2].push([ 'li', {}, [ c ] ]); };
+          lastlist.push(mk('li', {}, [ c ])); };
 
         // first the two easy cases...
 
@@ -343,36 +401,17 @@ var SaintMarc = (function() {
 
     // block: para
 
-    function rewrite_paraline(t) { return [ 'div', {}, t.string().trim() ]; }
-    function rewrite_para(t) { return [ 'p', {}, rwcn(t) ]; }
+    function rewrite_paraline(t) { return mk('div', {}, t.string().trim()); }
+    function rewrite_para(t) { return mk('p', {}, rwcn(t)); }
 
     // root
 
-    function rewrite_doc(t) { return [ 'doc', {}, rwcn(t) ]; }
+    function rewrite_doc(t) { return mk('doc', {}, rwcn(t)); }
 
   }); // end Parser
 
   //
   // protected methods
-
-  var toh = function(t, opts) {
-
-    var os = opts || {};
-
-    var t0 = t[0]; if (t0 === 'doc') t0 = 'div';
-
-    var tc = '', cn = t[2];
-    if (typeof cn === 'string') { tc = cn; cn = []; }
-
-    var e =
-      os.parent ?
-      H.create(opts.parent, t0, t[1], tc) :
-      H.create(t0, t[1], tc);
-    cn.forEach(function(ct) {
-      os.parent = e; toh(ct, os); });
-
-    return e;
-  };
 
   //
   // public methods
@@ -386,7 +425,8 @@ var SaintMarc = (function() {
 
   this.toHtml = function(s, opts) {
 
-    var t = self.parse(s, opts); return t ? toh(t, opts) : null;
+    //var t = self.parse(s, opts); return t ? toh(t, opts) : null;
+    var t = self.parse(s, opts); return t ? t.toHtml(opts) : null;
   };
 
   //
