@@ -192,6 +192,32 @@ One on two lines.
       )
     end
 
+    it 'manages paragraphs followed immediately by lists' do
+
+      s =
+        %{
+This a test paragraph.
+A paragraph with two lines (divs).
+* followed by a list
+* a list
+        }.strip + "\n"
+      t =
+        js "return SaintMarc.parse(#{s.inspect});"
+
+      expect(t).to eq(
+        ["doc",
+         {},
+         [["p",
+           {},
+           [["div", {}, "This a test paragraph."],
+            ["div", {}, "A paragraph with two lines (divs)."]]],
+          ["ul",
+           {},
+           [["li", {}, [["p", {}, "followed by a list"]]],
+            ["li", {}, [["p", {}, "a list"]]]]]]]
+      )
+    end
+
     it 'wraps inline HTML' do
 
       expect(js %q{

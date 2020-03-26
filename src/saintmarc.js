@@ -193,7 +193,7 @@ var SaintMarc = (function() {
 
     function listli(i) { return seq('listli', i, listli_head, inline, eol); }
 
-    function list(i) { return seq('list', i, listli, '+', blank_line); }
+    function list(i) { return seq('list', i, listli, '+', blank_line, '?'); }
 
     // block: para
 
@@ -201,7 +201,7 @@ var SaintMarc = (function() {
       return seq('paraline', i, listli_head, '!', inline, eol); }
 
     function para(i) {
-      return seq('para', i, paraline, '+', blank_line); }
+      return seq('para', i, paraline, '+', blank_line, '?'); }
 
     // root
 
