@@ -58,26 +58,6 @@ Click [here](http://example.com/).
       var clog = console.log;
       var cerr = console.error;
 
-      var toPre = function(depth, tree, out) {
-
-        var ind = ''; for (var i = 0; i < depth; i++) ind = ind + '  ';
-        out = out + (depth === 0 ? '' : '\n') + ind;
-
-        out = out + tree[0];
-
-        for (var k in tree[1]) {
-          out = out + ' ' + k + ': ' + JSON.stringify(tree[1][k]);
-        }
-        if (typeof tree[2] === 'string') {
-          out = out + ' ' + JSON.stringify(tree[2]);
-        }
-        else {
-          tree[2].forEach(function(tt) { out = toPre(depth + 1, tt, out); });
-        }
-
-        return out;
-      };
-
       var render = function() {
 
         var s = H.elt('#in').value.trim();
@@ -85,11 +65,11 @@ Click [here](http://example.com/).
         // #tree
         //
         try {
-          var t = SaintMarc.parse(s);
-          H.elt('#tree').textContent = t ? toPre(0, t, '') : '(parsing failed)';
+          var p = SaintMarc.toPre(s);
+          H.elt('#tree').textContent = p ? p : '(parsing failed)';
         } catch(err) {
           H.elt('#tree').textContent = '(parsing failed)';
-          cerr("SaintMarc.parse(s) failed...", err);
+          cerr("SaintMarc.toPre(s) failed...", err);
         }
 
         // #hout
