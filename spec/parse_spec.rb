@@ -30,8 +30,8 @@ describe 'SaintMarc' do
           'This is another paragraph\n');
       }).to eq(
         [ 'doc', {}, [
-          [ 'p', {}, [ [ 'span', {}, 'This is our test' ] ] ],
-          [ 'p', {}, [ [ 'span', {}, 'This is another paragraph' ] ] ],
+          [ 'p', {}, [ [ 'div', {}, 'This is our test' ] ] ],
+          [ 'p', {}, [ [ 'div', {}, 'This is another paragraph' ] ] ],
         ] ]
       )
     end
@@ -47,7 +47,7 @@ describe 'SaintMarc' do
       expect(t).to eq(
         [ "doc", {}, [
           [ "p", {}, [
-            [ "span",
+            [ "div",
               {},
               "Max 20% of portfolio in non-IG bonds (if any downgrades after " +
               "purchase) allowed with min Ba4/BB-/BB- rating." ] ] ] ] ]

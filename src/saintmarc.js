@@ -343,7 +343,7 @@ var SaintMarc = (function() {
 
     // block: para
 
-    function rewrite_paraline(t) { return [ 'span', {}, t.string().trim() ]; }
+    function rewrite_paraline(t) { return [ 'div', {}, t.string().trim() ]; }
     function rewrite_para(t) { return [ 'p', {}, rwcn(t) ]; }
 
     // root
