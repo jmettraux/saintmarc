@@ -92,6 +92,17 @@ var SaintMarcNode = {
 
     return out ? null : os.out.join('');
   },
+
+  innerText: function(opts) {
+
+    var os = opts || {};
+    var out = os.out; if ( ! out) os.out = [];
+
+    if (this.hasTextChild()) os.out.push(' ', this.children);
+    else this.children.forEach(function(c) { c.innerText(os); });
+
+    return out ? null : os.out.join('').slice(1);
+  },
 }; // end SaintMarcNode
 
 
