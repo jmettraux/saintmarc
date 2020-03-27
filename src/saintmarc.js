@@ -107,7 +107,7 @@ var SaintMarcNode = {
   lookup: function(tagName, opts) {
 
     var os = opts || {};
-    tagNames = Array.isArray(tagName) ? tagName : [ tagName ];
+    var tagNames = Array.isArray(tagName) ? tagName : [ tagName ];
 
     if (tagNames.includes(this.tag)) return this;
 
@@ -117,8 +117,10 @@ var SaintMarcNode = {
 
   gather: function(tagName, opts) {
 
-    var os = opts || { results: [] };
-    tagNames = Array.isArray(tagName) ? tagName : [ tagName ];
+    var os = opts || {};
+    os.results = os.results || [];
+    if ( ! os.results) os.results = [];
+    var tagNames = Array.isArray(tagName) ? tagName : [ tagName ];
 
     if (tagNames.includes(this.tag))
       os.results.push(this);

@@ -40,5 +40,47 @@ raspi dac speakers
       }.strip)
     end
   end
+
+  describe '.lookup()' do
+
+    it 'finds a node' do
+
+      s = %{
+My paragraph.
+* raspi
+* dac
+        }.strip
+      r =
+        js(
+          "return SaintMarc.parse(#{s.inspect})" +
+          ".lookup('ul')" +
+          ".toArray();");
+
+      expect(r).to eq(
+        ["ul", {}, [
+          ["li", {}, [["p", {}, "raspi"]]], ["li", {}, [["p", {}, "dac"]]]]])
+    end
+  end
+
+  describe '.gather()' do
+
+    it 'finds multiple nodes' do
+
+      s = %{
+My paragraph.
+* raspi
+* dac
+        }.strip
+      r =
+        js(
+          "return SaintMarc.parse(#{s.inspect})" +
+          ".gather('li')" +
+          ".map(function(n) { return n.toArray(); });")
+
+      expect(r).to eq(
+        [["li", {}, [["p", {}, "raspi"]]],
+         ["li", {}, [["p", {}, "dac"]]]])
+    end
+  end
 end
 
