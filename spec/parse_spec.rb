@@ -56,6 +56,19 @@ describe 'SaintMarc' do
       )
     end
 
+    it "doesn't mind an indent as a following paragraph"# do
+#
+#      s =
+#        %{
+#Max 20% of portfolio in non-IG bonds (if any downgrades after purchase) allowed with min Ba4/BB-/BB- rating. Max 20% of
+# portfolio in non-IG bonds (if any downgrades after purchase) allowed with min Ba4/BB-/BB- rating.
+#        }.strip
+#      t =
+#        js "return SaintMarc.parse(#{s.inspect}).toArray();"
+#pp t
+#fail
+#    end
+
     it 'parses a list of bullet points' do
 
       s =
@@ -164,6 +177,58 @@ describe 'SaintMarc' do
              {},
              [["p", {}, "immanuel"],
               ["ol", {}, [["li", {}, [["p", {}, "john"]]]]]]]]]]]
+      )
+    end
+
+    it 'parses ol followed by ul' do
+
+      s =
+        %{
+1. alpha
+2. bravo
+- charly
+- delta
+        }.strip + "\n"
+      t =
+        js "return SaintMarc.parse(#{s.inspect}).toArray();"
+
+      expect(t).to eq(
+        ["doc",
+         {},
+         [["ol",
+           {},
+           [["li", {}, [["p", {}, "alpha"]]],
+            ["li", {}, [["p", {}, "bravo"]]]]],
+          ["ul",
+           {},
+           [["li", {}, [["p", {}, "charly"]]],
+            ["li", {}, [["p", {}, "delta"]]]]]]]
+      )
+    end
+
+    it 'parses ul followed by ol' do
+
+      s =
+        %{
+- alpha
+- bravo
+1. charly
+2. delta
+        }.strip + "\n"
+      t =
+        js "return SaintMarc.parse(#{s.inspect}).toArray();"
+
+      expect(t).to eq(
+        ["doc",
+         {},
+         [["ul",
+           {},
+           [["li", {}, [["p", {}, "alpha"]]],
+            ["li", {}, [["p", {}, "bravo"]]]]],
+          ["ol",
+           {},
+           [["li", {}, [["p", {}, "charly"]]],
+            ["li", {}, [["p", {}, "delta"]]]]]]]
       )
     end
 

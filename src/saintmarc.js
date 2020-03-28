@@ -374,7 +374,7 @@ var SaintMarc = (function() {
         lis.unshift([ h.replace(/ /g, '.'), rewrite(tt.lookup('inline')) ]);
       });
 
-//clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
+clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
         // sample content for `lis`:
         //
       // - min thing
@@ -393,7 +393,7 @@ var SaintMarc = (function() {
 
       // second pass, gather list items into lists
 
-      var root = null;
+      var roots = [];
       var lists = [];
       var lastlist = null;
 
@@ -419,8 +419,8 @@ var SaintMarc = (function() {
 
         // first the two easy cases...
 
-        if ( ! root) { // add first `ul` or `ol`
-          lastlist = root = makeList(); continue;
+        if (roots.length < 1) { // add first `ul` or `ol`
+          roots.push(lastlist = makeList()); continue;
         }
 
         if (h === lastlist._head) { // add `li` to `ul` or `ol`
@@ -435,8 +435,13 @@ var SaintMarc = (function() {
           addToLi(); continue;
         }
 
-        if (h.length >= lastlist._head.length) { // add `ul` or `ol` to `li`
+        //if (h.length >= lastlist._head.length) { // add `ul` or `ol` to `li`
+        if (h.length > lastlist._head.length) { // add `ul` or `ol` to `li`
           lastlist = addToLi(makeList()); continue;
+        }
+
+        if (h.length == lastlist._head.length) { // new `ul` or `ol` showing up
+          roots.push(lastlist = makeList()); continue;
         }
 
         // add to list upstream, so find it...
@@ -455,7 +460,7 @@ var SaintMarc = (function() {
         else addLi();
       }
 
-      return root;
+      return roots;
     }
 
     // block: para
@@ -465,8 +470,17 @@ var SaintMarc = (function() {
 
     // root
 
-    function rewrite_doc(t) { return mk('doc', {}, rwcn(t)); }
+    function rewrite_doc(t) {
 
+      var cn = rwcn(t)
+        .reduce(
+          function(a, c) {
+            (Array.isArray(c) ? c : [ c ]).forEach(function(e) { a.push(e); });
+            return a; },
+          []);
+
+      return mk( 'doc', {}, cn);
+    }
   }); // end Parser
 
   //
