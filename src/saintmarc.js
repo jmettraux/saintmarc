@@ -131,6 +131,15 @@ var SaintMarcNode = {
   },
 }; // end SaintMarcNode
 
+SaintMarcNode.make =
+  function(tag, atts, children) {
+    var r = Object.create(SaintMarcNode);
+    r.tag = tag;
+    r.attributes = atts;
+    r.children = children || [];
+    return r;
+  };
+
 
 var SaintMarc = (function() {
 
@@ -328,13 +337,7 @@ var SaintMarc = (function() {
     //
     // rewrite
 
-    var mk = function(tag, atts, children) {
-      var r = Object.create(SaintMarcNode);
-      r.tag = tag;
-      r.attributes = atts;
-      r.children = children || [];
-      return r;
-    };
+    var mk = SaintMarcNode.make;
 
     function rwcn(t/*, subname*/) {
 
@@ -374,7 +377,7 @@ var SaintMarc = (function() {
         lis.unshift([ h.replace(/ /g, '.'), rewrite(tt.lookup('inline')) ]);
       });
 
-clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
+//clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
         // sample content for `lis`:
         //
       // - min thing
@@ -509,6 +512,15 @@ clog(lis.map(function(li) { return JSON.stringify(li); }).join('\n'));
   this.toPre = function(s, opts) {
 
     var t = self.parse(s, opts); return t ? t.toPre(opts) : null;
+  };
+
+  this.fromArray = function(a) {
+
+    var cn = a[2]; if (Array.isArray(cn)) {
+      cn = cn.map(function(c) { return self.fromArray(c); })
+    }
+
+    return SaintMarcNode.make(a[0], a[1], cn);
   };
 
   //
