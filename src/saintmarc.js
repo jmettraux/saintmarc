@@ -253,51 +253,52 @@ var SaintMarc = (function() {
     function dot(i) { return str(n, i, '.'); }
     function ws(i) { return rex(n, i, /[ \t]/); }
 
-    // html:
-
-    function startab(i) { return str(null, i, '<'); }
-    function endab(i) { return str(null, i, '>'); }
-    function slash(i) { return str(null, i, '/'); }
-
-    function htavv(i) { return rex('htavv', i, /"([^"]|\\")*"|'([^']|\\')*'/); }
-    function htavq(i) { return rex(null, i, /\s*=\s*/); }
-    function htak(i) { return rex('htak', i, /[a-zA-z][-a-zA-Z0-9]*/); }
-    function htav(i) { return seq(null, i, htavq, htavv); }
-    function htaa(i) { return rex(null, i, /\s+/); }
-    function hta(i) { return seq('hta', i, htaa, htak, htav, '?'); }
-
-    function htag(i) { return rex('htag', i, /[a-zA-Z][-a-zA-Z0-9]*/); }
-
-    function htxt(i) { return rex('htxt', i, /[^<]+/); }
-
-    function hbody(i) { return alt('hbody', i, htxt, html); }
-
-    function ochtml(i) {
-      return seq(
-        null, i,
-        startab, htag, hta, '*', endab,
-        hbody, '*',
-        startab, slash, htag, endab); }
-    function lhtml(i) {
-      return seq(
-        null, i,
-        startab, htag, hta, '*', endab); }
-    function chtml(i) {
-      return seq(
-        null, i,
-        startab, htag, hta, '*', slash, endab); }
-
-    function html(i) { return alt('html', i, chtml, ochtml, lhtml); }
+//    // html:
+//
+//    function startab(i) { return str(null, i, '<'); }
+//    function endab(i) { return str(null, i, '>'); }
+//    function slash(i) { return str(null, i, '/'); }
+//
+//    function htavv(i) { return rex('htavv', i, /"([^"]|\\")*"|'([^']|\\')*'/); }
+//    function htavq(i) { return rex(null, i, /\s*=\s*/); }
+//    function htak(i) { return rex('htak', i, /[a-zA-z][-a-zA-Z0-9]*/); }
+//    function htav(i) { return seq(null, i, htavq, htavv); }
+//    function htaa(i) { return rex(null, i, /\s+/); }
+//    function hta(i) { return seq('hta', i, htaa, htak, htav, '?'); }
+//
+//    function htag(i) { return rex('htag', i, /[a-zA-Z][-a-zA-Z0-9]*/); }
+//
+//    function htxt(i) { return rex('htxt', i, /[^<]+/); }
+//
+//    function hbody(i) { return alt('hbody', i, htxt, html); }
+//
+//    function ochtml(i) {
+//      return seq(
+//        null, i,
+//        startab, htag, hta, '*', endab,
+//        hbody, '*',
+//        startab, slash, htag, endab); }
+//    function lhtml(i) {
+//      return seq(
+//        null, i,
+//        startab, htag, hta, '*', endab); }
+//    function chtml(i) {
+//      return seq(
+//        null, i,
+//        startab, htag, hta, '*', slash, endab); }
+//
+//    function html(i) { return alt('html', i, chtml, ochtml, lhtml); }
 
     // inline:
 
-    function inplain(i) { return rex('inplain', i, /[^\r\n$]+/); }
-    function inhtml(i) { return ren('inhtml', i, html); }
+    //function inplain(i) { return rex('inplain', i, /[^<\r\n$]+/); }
+    //function inhtml(i) { return ren('inhtml', i, html); }
 
-    function inelt(i) { return alt('inelt', i, inhtml, inplain); }
+    //function inelt(i) { return alt('inelt', i, inhtml, inplain); }
+    //function inelt(i) { return alt('inelt', i, inplain); }
 
-    //function inline(i) { return rex('inline', i, /[^\r\n$]+/); } // FIXME
-    function inline(i) { return rep('inline', i, inelt, 1); }
+    function inline(i) { return rex('inline', i, /[^\r\n$]+/); } // FIXME
+    //function inline(i) { return rep('inline', i, inelt, 1); }
 
     // block: lists
 
