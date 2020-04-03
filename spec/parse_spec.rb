@@ -489,5 +489,39 @@ consequat.
       end
     end
   end
+
+  describe ".parse({ debug: 'blocks' })" do
+
+    {
+
+      "simple para." =>
+        [],
+      "Simple para.\n" +
+      "That goes on a second line." =>
+        [],
+      "A list follows this para\n" +
+      "* alpha\n" +
+      "* bravo\n" =>
+        [],
+      "* A list followed by a para\n" +
+      "* bravo\n" +
+      "This is a paragraph of explanation" =>
+        [],
+
+    }.each do |k, v|
+
+      kk = k.split("\n").first[0, 49]
+
+      it "debugs \"#{kk}...\" to #{v.inspect}" do
+
+        r = js(
+          "return SaintMarc" +
+            ".parse(#{k.inspect}, { debug: 'blocks' })" +
+            ".map(function(e) { return e.toA(); });")
+
+        expect(r).to eq(v)
+      end
+    end
+  end
 end
 

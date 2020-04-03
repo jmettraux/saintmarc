@@ -129,16 +129,24 @@ var SaintMarcNode = {
 
     return os.results;
   },
-}; // end SaintMarcNode
 
-SaintMarcNode.make =
-  function(tag, atts, children) {
+  make: function(tag, atts, children) {
     var r = Object.create(SaintMarcNode);
     r.tag = tag;
     r.attributes = atts;
     r.children = children || [];
     return r;
-  };
+  },
+}; // end SaintMarcNode
+
+//SaintMarcNode.make =
+//  function(tag, atts, children) {
+//    var r = Object.create(SaintMarcNode);
+//    r.tag = tag;
+//    r.attributes = atts;
+//    r.children = children || [];
+//    return r;
+//  };
 
 
 var SaintMarc = (function() {
@@ -150,10 +158,108 @@ var SaintMarc = (function() {
   this.VERSION = '2.0.0';
 
   //
+  // blocks
+
+  var determineLineType = function(line) {
+    if (line.match(/^\s*#{0,6} .+/)) return 'h';
+    if (line.match(/^\s*(---|\*\*\*|___)\s*$/)) return 'hr';
+    if (line.match(/^\s*\d+\. .+/)) return 'li';
+    if (line.match(/^\s*(\*|\+|-) .+/)) return 'li';
+    if (line.match(/^\s*$/)) return '';
+    return 'p';
+  };
+
+  // < mini object system >
+  var omake = function(object) {
+    var o = Object.create(object);
+    if (typeof o.make === 'function') {
+      o.make.apply(o, Array.prototype.slice.call(arguments, 1));
+    }
+    return o;
+  };
+  var odefine = function(object, properties) {
+    return Object.assign(
+      Object.create(object || {}),
+      (typeof properties === 'function') ? props(object) : properties);
+  };
+  // < / mini object system >
+
+  var Block = odefine(null, {
+    make: function() {
+      this.lines = []; },
+    isEmpty: function() {
+      return this.lines.length < 1; },
+    accept: function(line) {
+      return determineLineType(line) === this.lineType; },
+    push: function(line) {
+      this.lines.push(line); return line; },
+    toA: function() {
+      return [ this.lineType, this.lines ]; },
+  });
+  var HeaderBlock = odefine(Block, {
+    lineType: 'h',
+  });
+  var HruleBlock = odefine(Block, {
+    lineType: 'hr',
+  });
+  var ListBlock = odefine(Block, {
+    lineType: 'li',
+  });
+  var ParaBlock = odefine(Block, {
+    lineType: 'p',
+    accept: function(line) {
+      var lt = determineLineType(line);
+      return lt === 'p';
+    },
+  });
+
+  //
   // protected methods
+
+  var blockMake = function(line) {
+
+    var lt =
+      determineLineType(line);
+    var k;
+      if (lt === 'h') k = HeaderBlock;
+      else if (lt === 'hr') k = HruleBlock;
+      else if (lt === 'li') k = ListBlock;
+      else if (lt === 'p') k = ParaBlock;
+    if ( ! k) throw "don't know what Block to make out of '" + lt + "'";
+
+    var b = omake(k); b.push(line); return b;
+  };
+
+  var parseBlocks = function(s, opts) {
+
+    var currentBlock = omake(ParaBlock);
+    var blocks = [ currentBlock ];
+
+    s.split(/\r?\n/).forEach(function(line) {
+      if (currentBlock.accept(line)) { currentBlock.push(line); }
+      else { blocks.push(currentBlock = blockMake(line)); }
+    });
+
+    return blocks
+      .filter(function(b) { return b.lineType !== 'p' || ! b.isEmpty(); });
+  };
+
+  var parseNodes = function(t, opts) {
+  };
 
   //
   // public methods
+
+  this.parse = function(s, opts) {
+
+    if (typeof s !== 'string') throw "input is not a string";
+
+    var blocks = parseBlocks(s, opts);
+
+    if (opts.debug === 'blocks') return blocks;
+
+    return parseNodes(blocks, opts);
+  };
 
   //
   // done.
