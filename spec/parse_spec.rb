@@ -495,17 +495,58 @@ consequat.
     {
 
       "simple para." =>
-        [],
+        [ [ 'p', [ 'simple para.' ] ] ],
+
       "Simple para.\n" +
       "That goes on a second line." =>
-        [],
+        [ [ 'p', [ 'Simple para.', 'That goes on a second line.' ] ] ],
+
       "A list follows this para\n" +
       "* alpha\n" +
       "* bravo\n" =>
-        [],
+        [
+          [ 'p', [ 'A list follows this para' ] ],
+          [ 'ul', [
+            [ 'li', [ 'alpha' ] ],
+            [ 'li', [ 'bravo' ] ]
+          ] ],
+        ],
+
       "* A list followed by a para\n" +
       "* bravo\n" +
       "This is a paragraph of explanation" =>
+        [
+          [ 'ul', [
+            [ 'li', [ 'A list followed by a para' ] ],
+            [ 'li', [ 'bravo' ] ]
+          ] ],
+          [ 'p', [ 'This is a paragraph of explanation' ] ]
+        ],
+
+      "Paras, then nested lists\n" +
+      "* alpha\n" +
+      "  1. bravo\n" +
+      "  2. charly\n" +
+      "    * charly\n" =>
+        [
+          [ 'p', [ 'Paras, then nested lists' ] ],
+          [ 'ul', [
+            [ 'li', [
+              'alpha' ] ],
+              [ 'ol', [
+                [ 'li', [ 'bravo' ] ],
+                [ 'li', [ 'charly', [ 'ul', [ [ 'li', [ 'charly' ] ] ] ] ] ]
+              ] ] ] ] ],
+
+      "* a list item with a second line\n" +
+      "  here." =>
+        [],
+
+      "a para, then some html\n" +
+      "<ul>\n" +
+      "  <li>nada</li>\n" +
+      "</ul>\n" +
+      "last para" =>
         [],
 
     }.each do |k, v|

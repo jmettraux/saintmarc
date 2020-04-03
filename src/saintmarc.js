@@ -161,10 +161,11 @@ var SaintMarc = (function() {
   // blocks
 
   var determineLineType = function(line) {
-    if (line.match(/^\s*#{0,6} .+/)) return 'h';
+    if (line.match(/^\s*#{1,6} .+/)) return 'h';
     if (line.match(/^\s*(---|\*\*\*|___)\s*$/)) return 'hr';
     if (line.match(/^\s*\d+\. .+/)) return 'li';
     if (line.match(/^\s*(\*|\+|-) .+/)) return 'li';
+    if (line.match(/^<[a-z][a-zA-Z0-9]*[^>]*>/i)) return '<';
     if (line.match(/^\s*$/)) return '';
     return 'p';
   };
@@ -196,20 +197,86 @@ var SaintMarc = (function() {
     toA: function() {
       return [ this.lineType, this.lines ]; },
   });
+  var JumpBlock = odefine(Block, {
+    lineType: '',
+  });
   var HeaderBlock = odefine(Block, {
     lineType: 'h',
   });
   var HruleBlock = odefine(Block, {
     lineType: 'hr',
   });
-  var ListBlock = odefine(Block, {
-    lineType: 'li',
-  });
   var ParaBlock = odefine(Block, {
     lineType: 'p',
+  });
+  var HtmlBlock = odefine(Block, {
+    lineType: '<',
+    accept: function(line) {
+      return ! this.closed; },
+    push: function(line) {
+      this.tag = this.tag || line.match(/^<([^ >]+)/)[1];
+      var m = line.match(/^<\/([^>]+)>$/);
+      this.closed = (m && m[1] === this.tag);
+      this.lines.push(line); return line; },
+  });
+  var ListBlock = odefine(Block, {
+    lineType: 'li',
     accept: function(line) {
       var lt = determineLineType(line);
-      return lt === 'p';
+      return lt == 'li' || (lt == 'p' && line.match(/^  /));
+    },
+    toA: function() {
+      var lis = this.lines
+        .map(function(l) {
+          var m = l.match(/^( *[^ ]+\.?) +(.+)$/);
+          var li = [ 'li', [ m[2] ] ];
+          var mm = m[1].match(/^( *)\d/);
+          li._i = mm ? mm[1] + '1' : m[1];
+          li._l = mm ? 'ol' : 'ul';
+          return li; });
+      var toListNode = function(li) {
+        var ln = [ li._l, [ li ] ]; ln._i = li._i; return ln; };
+      var node = toListNode(lis[0]);
+      var nodes = [ nodes ];
+      for (var i = 1, l = lis.length; i < l; i++) {
+        var li = lis[i];
+        if (li._i === node._i) {
+          node[1].push(li);
+        }
+        else if (li._i.length > node._i.length) {
+          var n = toListNode(li);
+          node[1][node[1].length - 1].push(n);
+          node = n;
+          nodes.push(n);
+        }
+        else {
+throw "implement me!";
+        }
+      }
+      return nodes[0];
+      //var root = ls[0];
+      //var node = ls[0];
+      //for (var i = 1, l = ls.length; i < l; i++) {
+      //  var li = ls[i];
+      //  if (li[0] === node[0]) {
+      //    node[1].push(li[1][0]);
+      //  }
+      //  else if (li[0].length > node[0].length) {
+      //    node[1].push(li);
+      //    node = li;
+      //  }
+      //  else {
+      //    throw "IMPLEMENT ME!";
+      //  }
+      //};
+      //var toH = function(node) {
+      //  return [
+      //    node[0].match(/\d/) ?
+      //      'ol' : 'ul',
+      //    node[1].map(function(n) {
+      //      return [ 'li', [ (typeof n === 'string') ? n : toH(n) ] ]; }) ];
+      //};
+      //return toH(root);
     },
   });
 
@@ -225,6 +292,8 @@ var SaintMarc = (function() {
       else if (lt === 'hr') k = HruleBlock;
       else if (lt === 'li') k = ListBlock;
       else if (lt === 'p') k = ParaBlock;
+      else if (lt === '<') k = HtmlBlock;
+      else if (lt === '') k = JumpBlock;
     if ( ! k) throw "don't know what Block to make out of '" + lt + "'";
 
     var b = omake(k); b.push(line); return b;
@@ -235,16 +304,24 @@ var SaintMarc = (function() {
     var currentBlock = omake(ParaBlock);
     var blocks = [ currentBlock ];
 
-    s.split(/\r?\n/).forEach(function(line) {
-      if (currentBlock.accept(line)) { currentBlock.push(line); }
-      else { blocks.push(currentBlock = blockMake(line)); }
-    });
+    s
+      .split(/\r?\n/)
+      .forEach(function(line) {
+        if (currentBlock.accept(line)) {
+          currentBlock.push(line); }
+        else {
+          blocks.push(currentBlock = blockMake(line)); }
+      });
 
     return blocks
-      .filter(function(b) { return b.lineType !== 'p' || ! b.isEmpty(); });
+      .filter(function(b) {
+        if (b.lineType === '') return false;
+        if (b.lineType === 'p') return ! b.isEmpty();
+        return true; });
   };
 
   var parseNodes = function(t, opts) {
+throw "not yet implemented!"; // TODO
   };
 
   //
