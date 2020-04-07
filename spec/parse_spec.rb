@@ -539,8 +539,7 @@ consequat.
       "* a list item with a second line\n" +
       "  here." =>
         [["ul", [
-          ["li", ["a list item with a second line"]],
-          ["li", ["here."]]]]],
+          ["li", ["a list item with a second line","here."]]]]],
 
       "a para, then some html\n" +
       "<ul>\n" +
@@ -550,6 +549,17 @@ consequat.
         [["p", ["a para, then some html"]],
          ["<", ["<ul>", "  <li>nada</li>", "</ul>"]],
          ["p", ["last para"]]],
+
+      "* nested list\n" +
+      "  1. alpha\n" +
+      "     bravo\n" +
+      "* over.\n" =>
+        [["ul", [
+          ["li", [
+            "nested list",
+            ["ol", [["li", ["alpha", "bravo"]]]]]],
+          ["li", ["over."]]]]],
+
 
     }.each do |k, v|
 

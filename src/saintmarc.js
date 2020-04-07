@@ -266,18 +266,23 @@ var SaintMarc = (function() {
       es.forEach(function(e) {
         var n = lookupListNode(e);
         if (n) {
-          n[1].push(toLiNode(e));
-          node = n;
+          if (e.st) { // add `li` to list
+            n[1].push(toLiNode(e));
+            node = n;
+          }
+          else { // add line to `li`
+            node[1][node[1].length - 1][1].push(e.r);
+          }
         }
-        else if (e.l > node.l) {
+        else if (e.l > node.l) { // add list to list
           n = toListNode(e);
           node[1][node[1].length - 1][1].push(n);
           nodes.push(n);
           node = n;
         }
-        else {
-throw "implement me! 0 " + JSON.stringify(e);
-        }
+//        else { // add a new list?
+//throw "implement me! 0 " + JSON.stringify(e);
+//        }
       });
       return nodes[0];
     },
