@@ -527,27 +527,29 @@ consequat.
       "* alpha\n" +
       "  1. bravo\n" +
       "  2. charly\n" +
-      "    * charly\n" =>
-        [
-          [ 'p', [ 'Paras, then nested lists' ] ],
-          [ 'ul', [
-            [ 'li', [
-              'alpha' ] ],
-              [ 'ol', [
-                [ 'li', [ 'bravo' ] ],
-                [ 'li', [ 'charly', [ 'ul', [ [ 'li', [ 'charly' ] ] ] ] ] ]
-              ] ] ] ] ],
+      "    * delta\n" =>
+        [["p", ["Paras, then nested lists"]],
+         ["ul",
+          [["li",
+            ["alpha",
+             ["ol",
+              [["li", ["bravo"]],
+               ["li", ["charly", ["ul", [["li", ["delta"]]]]]]]]]]]]],
 
       "* a list item with a second line\n" +
       "  here." =>
-        [],
+        [["ul", [
+          ["li", ["a list item with a second line"]],
+          ["li", ["here."]]]]],
 
       "a para, then some html\n" +
       "<ul>\n" +
       "  <li>nada</li>\n" +
       "</ul>\n" +
       "last para" =>
-        [],
+        [["p", ["a para, then some html"]],
+         ["<", ["<ul>", "  <li>nada</li>", "</ul>"]],
+         ["p", ["last para"]]],
 
     }.each do |k, v|
 
@@ -560,6 +562,7 @@ consequat.
             ".parse(#{k.inspect}, { debug: 'blocks' })" +
             ".map(function(e) { return e.toA(); });")
 
+#pp r
         expect(r).to eq(v)
       end
     end

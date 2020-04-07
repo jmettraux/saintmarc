@@ -226,57 +226,60 @@ var SaintMarc = (function() {
       return lt == 'li' || (lt == 'p' && line.match(/^  /));
     },
     toA: function() {
-      var lis = this.lines
-        .map(function(l) {
-          var m = l.match(/^( *[^ ]+\.?) +(.+)$/);
-          var li = [ 'li', [ m[2] ] ];
-          var mm = m[1].match(/^( *)\d/);
-          li._i = mm ? mm[1] + '1' : m[1];
-          li._l = mm ? 'ol' : 'ul';
-          return li; });
-      var toListNode = function(li) {
-        var ln = [ li._l, [ li ] ]; ln._i = li._i; return ln; };
-      var node = toListNode(lis[0]);
-      var nodes = [ nodes ];
-      for (var i = 1, l = lis.length; i < l; i++) {
-        var li = lis[i];
-        if (li._i === node._i) {
-          node[1].push(li);
+      var es = this.lines.map(function(l) {
+        var e = {};
+        var m = l.match(/^(\s*)(.*)$/);
+        e.s = m[1];
+        l = m[2];
+        m = l.match(/^((\*|-|\d+\.)\s+)(.+)$/);
+        if (m) {
+          e.h = m[1];
+          e.t = m[1].match(/\d/) ? '1.' : m[2];
+          e.st = e.s + e.t;
+          e.l = e.s.length + e.h.length;
+          e.r = m[3] }
+        else {
+          e.l = e.s.length;
+          e.r = l; }
+        return e;
+      });
+//return es;
+      var toLiNode = function(e) {
+        return [ 'li', [ e.r ] ];
+      };
+      var toListNode = function(e) {
+        var n = [ e.t.match(/\d/) ? 'ol' : 'ul', [ toLiNode(e) ] ];
+        n.st = e.st;
+        n.l = e.l;
+        return n;
+      };
+      var node = toListNode(es.shift());
+      var nodes = [ node ];
+      var lookupListNode = function(e) {
+        for (var i = nodes.length - 1; i > -1; i--) {
+          var n = nodes[i];
+          if (e.st === n.st) return n;
+          if (( ! e.st) && e.l === n.l) return n;
         }
-        else if (li._i.length > node._i.length) {
-          var n = toListNode(li);
-          node[1][node[1].length - 1].push(n);
+        return null;
+      };
+      es.forEach(function(e) {
+        var n = lookupListNode(e);
+        if (n) {
+          n[1].push(toLiNode(e));
           node = n;
+        }
+        else if (e.l > node.l) {
+          n = toListNode(e);
+          node[1][node[1].length - 1][1].push(n);
           nodes.push(n);
+          node = n;
         }
         else {
-throw "implement me!";
+throw "implement me! 0 " + JSON.stringify(e);
         }
-      }
+      });
       return nodes[0];
-      //var root = ls[0];
-      //var node = ls[0];
-      //for (var i = 1, l = ls.length; i < l; i++) {
-      //  var li = ls[i];
-      //  if (li[0] === node[0]) {
-      //    node[1].push(li[1][0]);
-      //  }
-      //  else if (li[0].length > node[0].length) {
-      //    node[1].push(li);
-      //    node = li;
-      //  }
-      //  else {
-      //    throw "IMPLEMENT ME!";
-      //  }
-      //};
-      //var toH = function(node) {
-      //  return [
-      //    node[0].match(/\d/) ?
-      //      'ol' : 'ul',
-      //    node[1].map(function(n) {
-      //      return [ 'li', [ (typeof n === 'string') ? n : toH(n) ] ]; }) ];
-      //};
-      //return toH(root);
     },
   });
 
@@ -330,6 +333,8 @@ throw "not yet implemented!"; // TODO
   this.parse = function(s, opts) {
 
     if (typeof s !== 'string') throw "input is not a string";
+
+    opts = opts || {};
 
     var blocks = parseBlocks(s, opts);
 
