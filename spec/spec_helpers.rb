@@ -25,22 +25,28 @@ module Helpers
       .compile(File.read('spec/source.js'))
       .exec(s)
 
-  rescue ExecJS::ProgramError => err
+  rescue ExecJS::ProgramError, ExecJS::RuntimeError => err
 
-    m = err.backtrace[0].match(/:(\d+):(\d+)/)
+    m =
+      err.backtrace[0].match(/:(\d+):(\d+)/) ||
+      err.message.match(/:(\d+):(\d+)/)
+    raise unless m
+
     l = m[1].to_i
     c = m[2].to_i
 
+    cols = (`tput cols`.to_i rescue 80)
+
     lines = File.readlines('spec/source.js')
     l0 = [ 0, l - 14 ].max
-    print "[90m"
-    puts '-' * 80
+    puts "[90m" + ('=' * cols)
+    puts "[32m" + s + "[90m"
+    puts '-' * cols
     lines[l0..l - 1].each { |l| puts l }
     puts (' ' * c) + "[97m^-- " + err.inspect
     print "[90m"
     lines[l, 14].each { |l| puts l }
-    puts '-' * 80
-    print "[0;0m"
+    puts ('=' * cols) + "[0;0m"
 
     raise
   end
