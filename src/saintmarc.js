@@ -200,14 +200,21 @@ var SaintMarc = (function() {
   var JumpBlock = odefine(Block, {
     lineType: '',
   });
+  var ParaBlock = odefine(Block, {
+    lineType: 'p',
+  });
   var HeaderBlock = odefine(Block, {
     lineType: 'h',
+    accept: function(line) { return false; },
+    toA: function() {
+      var m = this.lines[0].match(/(#+)\s+(.+)$/);
+      return [ 'h' + m[1].length, m[2] ];
+    },
   });
   var HruleBlock = odefine(Block, {
     lineType: 'hr',
-  });
-  var ParaBlock = odefine(Block, {
-    lineType: 'p',
+    accept: function(line) { return false; },
+    toA: function() { return [ 'hr', [] ]; },
   });
   var HtmlBlock = odefine(Block, {
     lineType: '<',

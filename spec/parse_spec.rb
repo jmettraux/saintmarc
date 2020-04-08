@@ -560,6 +560,21 @@ consequat.
             ["ol", [["li", ["alpha", "bravo"]]]]]],
           ["li", ["over."]]]]],
 
+    "# header 1\n" +
+    "## header 1.1\n" +
+    "# header 2\n" =>
+      [["h1", "header 1"], ["h2", "header 1.1"], ["h1", "header 2"]],
+
+    "# header 1\n" +
+    "---\n" +
+    "# header 2\n" =>
+      [["h1", "header 1"], ["hr", []], ["h1", "header 2"]],
+
+    "<ul>\n" +
+    "  <li>dark horse live stream 5th</li>\n" +
+    "</ul>\n" =>
+      [["<", ["<ul>", "  <li>dark horse live stream 5th</li>", "</ul>"]]],
+
 
     }.each do |k, v|
 
