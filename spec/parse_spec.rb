@@ -614,5 +614,29 @@ consequat.
       end
     end
   end
+
+  describe ".parse() and a single para block" do
+
+    {
+
+      "simple para." =>
+        [ [ 'p', [ 'simple para.' ] ] ],
+
+    }.each do |k, v|
+
+      kk = k.split("\n").first[0, 49]
+
+      it "debugs \"#{kk}...\" to #{v.inspect}" do
+
+        r = js(
+          "return SaintMarc" +
+            ".parse(#{k.inspect})");
+            #".toArray();");
+
+#pp r
+        expect(r).to eq(v)
+      end
+    end
+  end
 end
 

@@ -139,15 +139,6 @@ var SaintMarcNode = {
   },
 }; // end SaintMarcNode
 
-//SaintMarcNode.make =
-//  function(tag, atts, children) {
-//    var r = Object.create(SaintMarcNode);
-//    r.tag = tag;
-//    r.attributes = atts;
-//    r.children = children || [];
-//    return r;
-//  };
-
 
 var SaintMarc = (function() {
 
@@ -197,6 +188,13 @@ var SaintMarc = (function() {
       this.lines.push(line); return line; },
     toA: function() {
       return [ this.lineType, this.lines ]; },
+    //toNode: function() {
+    //  var a = this.toA();
+    //  var cn = a[1].map(function(c) {
+    //    if (typeof c === 'string') parseContent
+    //  });
+    //  return SaintMarcNode(a[0], {}, cn);
+    //},
   });
   var JumpBlock = odefine(Block, {
     lineType: '',
@@ -345,8 +343,11 @@ var SaintMarc = (function() {
         return true; });
   };
 
-  var parseNodes = function(t, opts) {
-throw "not yet implemented!"; // TODO
+  var parseNodes = function(bs, opts) {
+
+    var ns = bs.map(function(b) { return b.toNode(); });
+
+    return (ns.length === 1) ? ns[0] : SaintMarcNode.make('div', {}, ns);
   };
 
   //
