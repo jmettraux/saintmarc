@@ -169,7 +169,7 @@ var SaintMarc = (function() {
     function rbz(i) { return str(n, i, ')'); }
 
     function t(i) { return rex('t', i, /[^_*()[\]]+/); }
-    function text(i) { return seq(n, i, t, piece, '?'); }
+    function text(i) { return seq('text', i, t, piece, '?'); }
 
     function url(i) { return rex('url', i, /https?:\/\/[^ )]+/); }
     function plink(i) { return ren('link', i, url); }
@@ -194,16 +194,46 @@ var SaintMarc = (function() {
     //
     // rewrite
 
-    function rwcn(t) { return t.subgather(arguments[1]).map(rewrite); }
-    function rwt(t) { return t.string(); }
+    function isStr(x) {
+      return typeof(x) === 'string'; }
+    function reduce(o) {
+      if (isStr(o)) return o;
+      if ( ! Array.isArray(o)) return o;
+      var a = o.reduce(
+        function(ac, e) {
+          ac.push((isStr(ac[ac.length - 1]) && isStr(e)) ? ac.pop() + e : e);
+          return ac; },
+        []);
+      if (a.length === 1 && isStr(a[0])) return a[0];
+      return a; }
+
+    var rwcn = function(t/*, name*/) {
+      return t.subgather(arguments[1]).map(rewrite); };
+    var rwt = function(t) {
+      return t.string(); };
+    var rw = function(t, name) {
+      var tt = t.lookup(name);
+      return tt ? rewrite(tt) : null; };
 
     var rewrite_wsstar = rwt;
     var rewrite_t = rwt;
-    var rewrite_piece = rwcn;
 
-    function rewrite_content(t) {
-return rwcn(t);
-    }
+      //function text(i) { return seq('text', i, t, piece, '?'); }
+      //
+    var rewrite_text = function(t) {
+      var et = rw(t, 't'); var st = et || '';
+      var ep = rw(t, 'piece');
+      if ( ! ep) return st;
+return { t: st, p: ep };
+    };
+
+    var rewrite_piece = function(t) {
+      return reduce(rwcn(t));
+    };
+
+    var rewrite_content = function(t) {
+      return reduce(rwcn(t));
+    };
   }); // end ContentParser
 
   var parseContent = function(s) {
@@ -259,14 +289,18 @@ return rwcn(t);
       return [ this.lineType, this.lines ]; },
     toNode: function() {
       var a = this.toA();
-      var cn = []; a[1].forEach(
-        function(c) {
-          if ((typeof cn[0] === 'string') && (typeof c === 'string')) {
-            cn[0] = cn[0] + '\n' + c; }
-          else {
-            cn.unshift(c); } });
-      cn = cn.map(function(c) {
-        return (typeof c === 'string') ? parseContent(c) : c.toNode(); });
+      var cn = a[1]
+        .reduce(
+          function(acc, c) {
+            acc.push(
+              typeof acc[acc.length - 1] === 'string' &&
+                typeof c === 'string' ?
+              acc.pop() + '\n' + c :
+              c);
+            return acc; },
+          [])
+        .map(function(c) {
+          return typeof c === 'string' ? parseContent(c) : c.toNode(); });
       return SaintMarcNode.make(a[0], {}, cn);
     },
   });
