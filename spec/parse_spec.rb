@@ -575,6 +575,12 @@ consequat.
     "</ul>\n" =>
       [["<", ["<ul>", "  <li>dark horse live stream 5th</li>", "</ul>"]]],
 
+    "* list\n" +
+    "* that is followed\n" +
+    "- by a list\n" =>
+      [["div", [
+        ["ul", [["li", ["list"]], ["li", ["that is followed"]]]],
+        ["ul", [["li", ["by a list"]]]]]]],
 
     }.each do |k, v|
 

@@ -283,15 +283,19 @@ var SaintMarc = (function() {
         }
         else if (e.l > node.l) { // add list to list
           n = toListNode(e);
+          n.parent = node;
           node[1][node[1].length - 1][1].push(n);
           nodes.push(n);
           node = n;
         }
-//        else { // add a new list?
-//throw "implement me! 0 " + JSON.stringify(e);
-//        }
+        else { // add a new root list
+          n = toListNode(e);
+          nodes.push(n);
+          node = n;
+        }
       });
-      return nodes[0];
+      var roots = nodes.filter(function(n) { return ! n.parent; });
+      return (roots.length > 1) ? [ 'div', roots ] : roots[0];
     },
   });
 
