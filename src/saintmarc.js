@@ -254,10 +254,12 @@ var SaintMarc = (function() {
       var toLiNode = function(e) {
         return [ 'li', [ e.r ] ];
       };
-      var toListNode = function(e) {
+      var toListNode = function(e, par) {
         var n = [ e.t.match(/\d/) ? 'ol' : 'ul', [ toLiNode(e) ] ];
         n.st = e.st;
         n.l = e.l;
+        if (par) { par[1][par[1].length - 1][1].push(n); }
+        else { n.root = true; }
         return n;
       };
       var node = toListNode(es.shift());
@@ -282,19 +284,13 @@ var SaintMarc = (function() {
           }
         }
         else if (e.l > node.l) { // add list to list
-          n = toListNode(e);
-          n.parent = node;
-          node[1][node[1].length - 1][1].push(n);
-          nodes.push(n);
-          node = n;
+          nodes.push(node = toListNode(e, node));
         }
         else { // add a new root list
-          n = toListNode(e);
-          nodes.push(n);
-          node = n;
+          nodes.push(node = toListNode(e));
         }
       });
-      var roots = nodes.filter(function(n) { return ! n.parent; });
+      var roots = nodes.filter(function(n) { return n.root; });
       return (roots.length > 1) ? [ 'div', roots ] : roots[0];
     },
   });
