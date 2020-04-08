@@ -582,6 +582,22 @@ consequat.
         ["ul", [["li", ["list"]], ["li", ["that is followed"]]]],
         ["ul", [["li", ["by a list"]]]]]]],
 
+    "---\n" +
+    "***\n" +
+    "___\n" =>
+      [["hr", []], ["hr", []], ["hr", []]],
+
+    "> this is a blockquote\n" =>
+      [["blockquote", ["this is a blockquote"]]],
+
+    "> another blockquote\n" +
+    "> on two lines\n" +
+    "not a blockquote\n" +
+    "> yet another blockquote\n" =>
+      [["blockquote", ["another blockquote", "on two lines"]],
+       ["p", ["not a blockquote"]],
+       ["blockquote", ["yet another blockquote"]]],
+
     }.each do |k, v|
 
       kk = k.split("\n").first[0, 49]

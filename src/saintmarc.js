@@ -166,6 +166,7 @@ var SaintMarc = (function() {
     if (line.match(/^\s*\d+\. .+/)) return 'li';
     if (line.match(/^\s*(\*|\+|-) .+/)) return 'li';
     if (line.match(/^<[a-z][a-zA-Z0-9]*[^>]*>/i)) return '<';
+    if (line.match(/^> /)) return '>';
     if (line.match(/^\s*$/)) return '';
     return 'p';
   };
@@ -225,6 +226,14 @@ var SaintMarc = (function() {
       var m = line.match(/^<\/([^>]+)>$/);
       this.closed = (m && m[1] === this.tag);
       this.lines.push(line); return line; },
+  });
+  var QuoteBlock = odefine(Block, {
+    lineType: '>',
+    toA: function() {
+      return [
+        'blockquote',
+        this.lines.map(function(l) { return l.substring(2); }) ];
+    },
   });
   var ListBlock = odefine(Block, {
     lineType: 'li',
@@ -308,6 +317,7 @@ var SaintMarc = (function() {
       else if (lt === 'li') k = ListBlock;
       else if (lt === 'p') k = ParaBlock;
       else if (lt === '<') k = HtmlBlock;
+      else if (lt === '>') k = QuoteBlock;
       else if (lt === '') k = JumpBlock;
     if ( ! k) throw "don't know what Block to make out of '" + lt + "'";
 
