@@ -149,6 +149,37 @@ var SaintMarc = (function() {
   this.VERSION = '2.0.0';
 
   //
+  // content
+
+  var ContentParser = Jaabro.makeParser(function() {
+
+    //
+    // parse
+
+    function content(i) { return rex('content', i, /.+/); };
+
+    var root = content;
+
+    //
+    // rewrite
+
+    function rewrite_content(t) {
+throw "implement me!";
+    }
+  }); // end ContentParser
+
+  var parseContent = function(s) {
+
+//return SaintMarcNode.make('span', {}, s);
+
+    var cn = ContentParser.parse(s);
+
+    // TODO shuffle...
+
+    return SaintMarcNode.make('span', {}, cn);
+  };
+
+  //
   // blocks
 
   var determineLineType = function(line) {
@@ -188,13 +219,18 @@ var SaintMarc = (function() {
       this.lines.push(line); return line; },
     toA: function() {
       return [ this.lineType, this.lines ]; },
-    //toNode: function() {
-    //  var a = this.toA();
-    //  var cn = a[1].map(function(c) {
-    //    if (typeof c === 'string') parseContent
-    //  });
-    //  return SaintMarcNode(a[0], {}, cn);
-    //},
+    toNode: function() {
+      var a = this.toA();
+      var cn = []; a[1].forEach(
+        function(c) {
+          if ((typeof cn[0] === 'string') && (typeof c === 'string')) {
+            cn[0] = cn[0] + '\n' + c; }
+          else {
+            cn.unshift(c); } });
+      cn = cn.map(function(c) {
+        return (typeof c === 'string') ? parseContent(c) : c.toNode(); });
+      return SaintMarcNode.make(a[0], {}, cn);
+    },
   });
   var JumpBlock = odefine(Block, {
     lineType: '',
@@ -283,19 +319,14 @@ var SaintMarc = (function() {
         var n = lookupListNode(e);
         if (n) {
           if (e.st) { // add `li` to list
-            n[1].push(toLiNode(e));
-            node = n;
-          }
+            n[1].push(toLiNode(e)); node = n; }
           else { // add line to `li`
-            node[1][node[1].length - 1][1].push(e.r);
-          }
+            node[1][node[1].length - 1][1].push(e.r); }
         }
         else if (e.l > node.l) { // add list to list
-          nodes.push(node = toListNode(e, node));
-        }
+          nodes.push(node = toListNode(e, node)); }
         else { // add a new root list
-          nodes.push(node = toListNode(e));
-        }
+          nodes.push(node = toListNode(e)); }
       });
       var roots = nodes.filter(function(n) { return n.root; });
       return (roots.length > 1) ? [ 'div', roots ] : roots[0];
