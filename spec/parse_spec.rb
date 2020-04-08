@@ -630,8 +630,8 @@ consequat.
 
         r = js(
           "return SaintMarc" +
-            ".parse(#{k.inspect})" +
-            ".toArray();");
+            ".parse(#{k.inspect});");
+            #".parse(#{k.inspect}).toArray();")
 
 pp r
         expect(r).to eq(v)

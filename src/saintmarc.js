@@ -156,15 +156,53 @@ var SaintMarc = (function() {
     //
     // parse
 
-    function content(i) { return rex('content', i, /.+/); };
+    var n = null;
+
+    function wsstar(i) { return rex('wsstar', i, /\s*/); }
+    function und(i) { return str(n, i, '_'); }
+    function sta(i) { return str(n, i, '*'); }
+    function und2(i) { return str(n, i, '__'); }
+    function sta2(i) { return str(n, i, '**'); }
+    function sba(i) { return str(n, i, '['); }
+    function sbz(i) { return str(n, i, ']'); }
+    function rba(i) { return str(n, i, '('); }
+    function rbz(i) { return str(n, i, ')'); }
+
+    function t(i) { return rex('t', i, /[^_*()[\]]+/); }
+    function text(i) { return seq(n, i, t, piece, '?'); }
+
+    function url(i) { return rex('url', i, /https?:\/\/[^ )]+/); }
+    function plink(i) { return ren('link', i, url); }
+    function blink(i) { return seq('link', i, sba, text, sbz, rba, url, rbz); }
+    function link(i) { return alt(n, i, blink, plink, text); }
+
+    function undbold(i) { return seq('bold', i, und2, link, und2); }
+    function stabold(i) { return seq('bold', i, sta2, link, sta2); }
+    function bold(i) { return alt(n, i, stabold, undbold, link); }
+
+    function unditalic(i) { return seq('italic', i, und, bold, und); }
+    function staitalic(i) { return seq('italic', i, sta, bold, sta); }
+    function italic(i) { return alt(n, i, staitalic, unditalic, bold); }
+
+    function piece(i) { return ren('piece', i, italic); }
+    function wspiece(i) { return seq(n, i, wsstar, piece); }
+
+    function content(i) { return seq('content', i, wspiece, '*', wsstar); }
 
     var root = content;
 
     //
     // rewrite
 
+    function rwcn(t) { return t.subgather(arguments[1]).map(rewrite); }
+    function rwt(t) { return t.string(); }
+
+    var rewrite_wsstar = rwt;
+    var rewrite_t = rwt;
+    var rewrite_piece = rwcn;
+
     function rewrite_content(t) {
-throw "implement me!";
+return rwcn(t);
     }
   }); // end ContentParser
 
