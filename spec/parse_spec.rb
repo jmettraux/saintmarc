@@ -615,12 +615,19 @@ consequat.
     end
   end
 
-  describe ".parse() and a single para block" do
+  describe ".parse() and a single block" do
 
     {
 
       "simple para." =>
-        [ [ 'p', [ 'simple para.' ] ] ],
+        ["p", {}, [["span", {}, "simple para."]]],
+
+      "a para on\n" +
+      "two lines." =>
+        ["p", {}, [["span", {}, "a para on\ntwo lines."]]],
+
+      "this is *in italic*, right" =>
+        [],
 
     }.each do |k, v|
 
@@ -628,12 +635,11 @@ consequat.
 
       it "debugs \"#{kk}...\" to #{v.inspect}" do
 
-        r = js(
-          "return SaintMarc" +
-            ".parse(#{k.inspect});");
-            #".parse(#{k.inspect}).toArray();")
-
+        r = js("return SaintMarc.parse(#{k.inspect});");
 pp r
+        r = js("return SaintMarc.parse(#{k.inspect}).toArray();");
+#pp r
+
         expect(r).to eq(v)
       end
     end

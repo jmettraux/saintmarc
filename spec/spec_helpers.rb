@@ -40,7 +40,7 @@ module Helpers
     lines = File.readlines('spec/source.js')
     l0 = [ 0, l - 14 ].max
     puts "[90m" + ('=' * cols)
-    puts "[32m" + s + "[90m"
+    puts "[33m" + s + "[90m"
     puts '-' * cols
     lines[l0..l - 1].each { |l| puts l }
     puts (' ' * c) + "[97m^-- " + err.inspect

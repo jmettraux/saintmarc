@@ -24,7 +24,7 @@
 
 var SaintMarcNode = {
 
-  hasTextChild: function() { return (typeof this.children) === 'string'; },
+  hasTextChild: function() { return (typeof this.children === 'string'); },
   hasChildrenArray: function() { return Array.isArray(this.children); },
 
   lastChild: function() {
@@ -201,14 +201,22 @@ var SaintMarc = (function() {
       if ( ! Array.isArray(o)) return o;
       var a = o.reduce(
         function(ac, e) {
+          if ( ! e) return ac;
           ac.push((isStr(ac[ac.length - 1]) && isStr(e)) ? ac.pop() + e : e);
           return ac; },
         []);
       if (a.length === 1 && isStr(a[0])) return a[0];
       return a; }
 
+    var nmake = function(t, as, cn) {
+      //if (Array.isArray(cn) && cn.length === 1 && isStr(cn[0])) cn = cn[0];
+      return SaintMarcNode.make(t, as, cn);
+    };
+
     var rwcn = function(t/*, name*/) {
       return t.subgather(arguments[1]).map(rewrite); };
+    var rrcn = function(t/*, name*/) {
+      return reduce(rwcn(t, arguments[1])); }
     var rwt = function(t) {
       return t.string(); };
     var rw = function(t, name) {
@@ -218,34 +226,19 @@ var SaintMarc = (function() {
     var rewrite_wsstar = rwt;
     var rewrite_t = rwt;
 
-      //function text(i) { return seq('text', i, t, piece, '?'); }
-      //
-    var rewrite_text = function(t) {
-      var et = rw(t, 't'); var st = et || '';
-      var ep = rw(t, 'piece');
-      if ( ! ep) return st;
-return { t: st, p: ep };
+    var rewrite_italic = function(t) {
+return [ 'i', {}, rrcn(t) ];
+      return nmake('i', {}, rrcn(t));
     };
 
-    var rewrite_piece = function(t) {
-      return reduce(rwcn(t));
-    };
+    var rewrite_text = rrcn;
+    var rewrite_piece = rrcn;
 
-    var rewrite_content = function(t) {
-      return reduce(rwcn(t));
-    };
+    var rewrite_content = rrcn;
+
   }); // end ContentParser
 
-  var parseContent = function(s) {
-
-//return SaintMarcNode.make('span', {}, s);
-
-    var cn = ContentParser.parse(s);
-
-    // TODO shuffle...
-
-    return SaintMarcNode.make('span', {}, cn);
-  };
+  var parseContent = function(s) { return ContentParser.parse(s); };
 
   //
   // blocks
@@ -301,7 +294,8 @@ return { t: st, p: ep };
           [])
         .map(function(c) {
           return typeof c === 'string' ? parseContent(c) : c.toNode(); });
-      return SaintMarcNode.make(a[0], {}, cn);
+      //return SaintMarcNode.make(a[0], {}, cn);
+      return [ a[0], {}, cn ];
     },
   });
   var JumpBlock = odefine(Block, {
