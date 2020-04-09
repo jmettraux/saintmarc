@@ -24,15 +24,6 @@
 
 var SaintMarcNode = {
 
-  hasTextChild: function() { return (typeof this.children === 'string'); },
-  hasChildrenArray: function() { return Array.isArray(this.children); },
-
-  lastChild: function() {
-
-    if ( ! this.hasChildrenArray()) return undefined;
-    return this.children[this.children.length - 1];
-  },
-
   push: function(child) {
 
     this.children.push(child);
@@ -47,9 +38,8 @@ var SaintMarcNode = {
     return [
       this.tag,
       this.attributes,
-      this.hasChildrenArray() ?
-        this.children.map(function(c) { return c.toArray(os); }) :
-        this.children ];
+      this.children.map(function(c) {
+        return (typeof c === 'string') ? c : c.toArray(os); }) ];
   },
 
   toHtml: function(opts) {
@@ -58,13 +48,14 @@ var SaintMarcNode = {
 
     var e = document.createElement(this.tag === 'doc' ? 'div' : this.tag);
     for (var k in this.attributes) e.setAttribute(k, this.attributes[k]);
-    if (this.hasTextChild())
+    this.children.forEach(function(c) {
       e.appendChild(
-        document.createTextNode('' + this.children));
-    else
-      this.children.forEach(
-        function(c) { c.toHtml(Object.assign({}, os, { parent: e })); });
+        (typeof c === 'string') ?
+        document.createTextNode(c) :
+        c.toHtml(Object.assign({}, os, { parent: e })));
+    });
     if (os.parent) os.parent.appendChild(e);
+
     return e;
   },
 
@@ -83,12 +74,10 @@ var SaintMarcNode = {
       os.out.push(' ', k, ': ', JSON.stringify(this.attributes[k]));
     }
 
-    if (this.hasTextChild())
-      os.out.push(' ', JSON.stringify(this.children));
-    else
-      this.children.forEach(function(c) {
-        c.toPre(Object.assign({}, os, { depth: depth + 1 }));
-      });
+    this.children.forEach(function(c) {
+      if (typeof c === 'string') os.out.push(' ', JSON.stringify(c));
+      else c.toPre(Object.assign({}, os, { depth: depth + 1 }));
+    });
 
     return out ? null : os.out.join('');
   },
@@ -98,8 +87,10 @@ var SaintMarcNode = {
     var os = opts || {};
     var out = os.out; if ( ! out) os.out = [];
 
-    if (this.hasTextChild()) os.out.push(' ', this.children);
-    else this.children.forEach(function(c) { c.innerText(os); });
+    this.children.forEach(function(c) {
+      if (typeof c === 'string') os.out.push(' ', c);
+      else c.innerText(os);
+    });
 
     return out ? null : os.out.join('').slice(1);
   },
@@ -111,8 +102,9 @@ var SaintMarcNode = {
 
     if (tagNames.includes(this.tag)) return this;
 
-    if (this.hasTextChild()) return null;
-    return this.children.find(function(c) { return c.lookup(tagNames, os); });
+    return this.children.find(function(c) {
+      if (typeof c === 'string') return false;
+      return c.lookup(tagNames, os); });
   },
 
   gather: function(tagName, opts) {
@@ -125,7 +117,9 @@ var SaintMarcNode = {
     if (tagNames.includes(this.tag))
       os.results.push(this);
     else if (this.hasChildrenArray())
-      this.children.forEach(function(c) { c.gather(tagNames, os); });
+      this.children.forEach(function(c) {
+        if (typeof c === 'string') return;
+        c.gather(tagNames, os); });
 
     return os.results;
   },
@@ -227,7 +221,6 @@ var SaintMarc = (function() {
     var rewrite_t = rwt;
 
     var rewrite_italic = function(t) {
-return [ 'i', {}, rrcn(t) ];
       return nmake('i', {}, rrcn(t));
     };
 
@@ -294,8 +287,8 @@ return [ 'i', {}, rrcn(t) ];
           [])
         .map(function(c) {
           return typeof c === 'string' ? parseContent(c) : c.toNode(); });
-      //return SaintMarcNode.make(a[0], {}, cn);
-      return [ a[0], {}, cn ];
+      //return [ a[0], {}, cn ];
+      return SaintMarcNode.make(a[0], {}, cn);
     },
   });
   var JumpBlock = odefine(Block, {
