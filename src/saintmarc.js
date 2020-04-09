@@ -191,19 +191,13 @@ var SaintMarc = (function() {
     function isStr(x) {
       return typeof(x) === 'string'; }
     function reduce(o) {
-      if (isStr(o)) return o;
-      if ( ! Array.isArray(o)) return o;
-      var a = o.reduce(
-        function(ac, e) {
-          if ( ! e) return ac;
-          ac.push((isStr(ac[ac.length - 1]) && isStr(e)) ? ac.pop() + e : e);
-          return ac; },
-        []);
-      if (a.length === 1 && isStr(a[0])) return a[0];
+      var a = arguments[1] || [];
+      if (isStr(o)) { a.push(isStr(a[a.length - 1]) ? a.pop() + o : o); }
+      else if (Array.isArray(o)) { o.forEach(function(e) { reduce(e, a); }); }
+      else { a.push(o); }
       return a; }
 
     var nmake = function(t, as, cn) {
-      //if (Array.isArray(cn) && cn.length === 1 && isStr(cn[0])) cn = cn[0];
       return SaintMarcNode.make(t, as, cn);
     };
 
@@ -287,7 +281,7 @@ var SaintMarc = (function() {
           [])
         .map(function(c) {
           return typeof c === 'string' ? parseContent(c) : c.toNode(); });
-      //return [ a[0], {}, cn ];
+      if (Array.isArray(cn) && cn.length === 1) cn = cn[0];
       return SaintMarcNode.make(a[0], {}, cn);
     },
   });

@@ -620,14 +620,14 @@ consequat.
     {
 
       "simple para." =>
-        ["p", {}, [["span", {}, "simple para."]]],
+        ["p", {}, ["simple para."]],
 
       "a para on\n" +
       "two lines." =>
-        ["p", {}, [["span", {}, "a para on\ntwo lines."]]],
+        ["p", {}, ["a para on\ntwo lines."]],
 
       "this is *in italic*, right" =>
-        [],
+        ["p", {}, ["this is ", ["i", {}, ["in italic"]], ", right"]],
 
     }.each do |k, v|
 
@@ -635,10 +635,10 @@ consequat.
 
       it "debugs \"#{kk}...\" to #{v.inspect}" do
 
-        r = js("return SaintMarc.parse(#{k.inspect});");
-pp r
+        #r = js("return SaintMarc.parse(#{k.inspect});");
+        #pp r
         r = js("return SaintMarc.parse(#{k.inspect}).toArray();");
-#pp r
+        #pp r
 
         expect(r).to eq(v)
       end
