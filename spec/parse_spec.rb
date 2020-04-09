@@ -627,14 +627,14 @@ consequat.
         ["p", {}, ["a para on\ntwo lines."]],
 
       "*italic*" =>
-        ["p", {}, ["", ["i", {}, ["italic"]], ""]],
+        ["p", {}, [["i", {}, ["italic"]]]],
       "this is *in italic*, right" =>
         ["p", {}, ["this is ", ["i", {}, ["in italic"]], ", right"]],
       "this is _in italic_, right" =>
         ["p", {}, ["this is ", ["i", {}, ["in italic"]], ", right"]],
 
       "*bold*" =>
-        ["p", {}, ["", ["i", {}, ["bold"]], ""]],
+        ["p", {}, [["i", {}, ["bold"]]]],
       "this is **bold**, left" =>
         ["p", {}, ["this is ", ["b", {}, ["bold"]], ", left"]],
       "this is __bold__, left" =>

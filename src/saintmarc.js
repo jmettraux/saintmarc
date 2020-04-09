@@ -192,7 +192,8 @@ var SaintMarc = (function() {
       return typeof(x) === 'string'; }
     function reduce(o) {
       var a = arguments[1] || [];
-      if (isStr(o)) { a.push(isStr(a[a.length - 1]) ? a.pop() + o : o); }
+      if (isStr(o)) {
+        if (o.length > 1) a.push(isStr(a[a.length - 1]) ? a.pop() + o : o); }
       else if (Array.isArray(o)) { o.forEach(function(e) { reduce(e, a); }); }
       else { a.push(o); }
       return a; }
