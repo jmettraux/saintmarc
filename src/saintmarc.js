@@ -214,9 +214,8 @@ var SaintMarc = (function() {
     var rewrite_wsstar = rwt;
     var rewrite_t = rwt;
 
-    var rewrite_italic = function(t) {
-      return nmake('i', {}, rrcn(t));
-    };
+    var rewrite_bold = function(t) { return nmake('b', {}, rrcn(t)); };
+    var rewrite_italic = function(t) { return nmake('i', {}, rrcn(t)); };
 
     var rewrite_text = rrcn;
     var rewrite_piece = rrcn;
