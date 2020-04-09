@@ -640,6 +640,18 @@ consequat.
       "this is __bold__, left" =>
         ["p", {}, ["this is ", ["b", {}, ["bold"]], ", left"]],
 
+      "this is __bold and _emphasised___" =>
+        ["p", {}, [
+          "this is ", ["b", {}, ["bold and ", ["i", {}, ["emphasised"]]]]]],
+
+      "this is a [link](http://a.example.org/link)" =>
+        ["p", {}, [
+          "this is a ",
+          ["a", {"href"=>"http://a.example.org/link"}, ["link"]]]],
+      #"this is a http://a.example.org/link and a \n" +
+      #"https://b.example.org/l?a=b#fragment" =>
+      #  [],
+
     }.each do |k, v|
 
       kk = k.split("\n").first[0, 49]

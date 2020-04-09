@@ -215,6 +215,12 @@ var SaintMarc = (function() {
     var rewrite_wsstar = rwt;
     var rewrite_t = rwt;
 
+    var rewrite_link = function(t) {
+      var tt = t.lookup('text');
+      var ut = t.lookup('url');
+      return nmake('a', { href: ut.string() }, rrcn(tt));
+    };
+
     var rewrite_bold = function(t) { return nmake('b', {}, rrcn(t)); };
     var rewrite_italic = function(t) { return nmake('i', {}, rrcn(t)); };
 
