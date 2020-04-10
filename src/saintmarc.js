@@ -152,7 +152,6 @@ var SaintMarc = (function() {
 
     var n = null;
 
-    function wsstar(i) { return rex('wsstar', i, /\s*/); }
     function und(i) { return str(n, i, '_'); }
     function sta(i) { return str(n, i, '*'); }
     function und2(i) { return str(n, i, '__'); }
@@ -162,13 +161,13 @@ var SaintMarc = (function() {
     function rba(i) { return str(n, i, '('); }
     function rbz(i) { return str(n, i, ')'); }
 
+    function url(i) { return rex('url', i, /https?:\/\/[^ )]+/); }
+
     function t(i) { return rex('t', i, /[^_*()[\]]+/); }
     function text(i) { return seq('text', i, t, piece, '?'); }
 
-    function url(i) { return rex('url', i, /https?:\/\/[^ )]+/); }
-    function plink(i) { return ren('link', i, url); }
     function blink(i) { return seq('link', i, sba, text, sbz, rba, url, rbz); }
-    function link(i) { return alt(n, i, blink, plink, text); }
+    function link(i) { return alt(n, i, blink, text); }
 
     function undbold(i) { return seq('bold', i, und2, link, und2); }
     function stabold(i) { return seq('bold', i, sta2, link, sta2); }
@@ -179,9 +178,8 @@ var SaintMarc = (function() {
     function italic(i) { return alt(n, i, staitalic, unditalic, bold); }
 
     function piece(i) { return ren('piece', i, italic); }
-    function wspiece(i) { return seq(n, i, wsstar, piece); }
 
-    function content(i) { return seq('content', i, wspiece, '*', wsstar); }
+    function content(i) { return rep('content', i, piece, 0); }
 
     var root = content;
 
