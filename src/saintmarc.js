@@ -217,6 +217,11 @@ var SaintMarc = (function() {
 
     var rewrite_t = rwt;
 
+    var rewrite_turl = function(t) {
+      var h = t.string();
+      return nmake('a', { href: h }, [ h ]);
+    };
+
     var rewrite_link = function(t) {
       var tt = t.lookup('text');
       var ut = t.lookup('url');

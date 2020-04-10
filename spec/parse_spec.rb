@@ -648,15 +648,23 @@ consequat.
         ["p", {}, [
           "this is a ",
           ["a", {"href"=>"http://a.example.org/link"}, ["link"]]]],
-      #"this is a http://a.example.org/link and a \n" +
-      #"https://b.example.org/l?a=b#fragment" =>
-      #  [],
+
+      "this is a http://a.example.org/link and a \n" +
+      "https://b.example.org/l?a=b#fragment" =>
+        ["p", {}, [
+          "this is a ",
+          ["a", {"href"=>"http://a.example.org/link"}, [
+            "http://a.example.org/link"]],
+          " and a \n",
+          ["a", {"href"=>"https://b.example.org/l?a=b#fragment"}, [
+            "https://b.example.org/l?a=b#fragment"]]]],
 
     }.each do |k, v|
 
-      kk = k.split("\n").first[0, 49]
+      kk = k.split("\n").first[0, 35]
+      vv = v.inspect[0, 35]
 
-      it "debugs \"#{kk}...\" to #{v.inspect}" do
+      it "parses \"#{kk}...\" to #{vv}..." do
 
         #r = js("return SaintMarc.parse(#{k.inspect});");
         #pp r
