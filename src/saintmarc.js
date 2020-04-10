@@ -161,12 +161,18 @@ var SaintMarc = (function() {
     function rba(i) { return str(n, i, '('); }
     function rbz(i) { return str(n, i, ')'); }
 
-    function url(i) { return rex('url', i, /https?:\/\/[^ )]+/); }
+    function th(i) { return str('t', i, 'h'); }
 
-    function t(i) { return rex('t', i, /[^_*()[\]]+/); }
-    function text(i) { return seq('text', i, t, piece, '?'); }
+    function turl(i) { return rex('turl', i, /https?:\/\/[^\s]+/); }
 
-    function blink(i) { return seq('link', i, sba, text, sbz, rba, url, rbz); }
+    function tu(i) { return alt(n, i, turl, th); }
+    function tnu(i) { return rex('t', i, /[^_*()[\]h]+/); }
+    function txt(i) { return seq(n, i, tnu, tu, '?'); }
+
+    function text(i) { return seq('text', i, txt, '+', piece, '?'); }
+
+    function burl(i) { return rex('url', i, /https?:\/\/[^ )]+/); }
+    function blink(i) { return seq('link', i, sba, text, sbz, rba, burl, rbz); }
     function link(i) { return alt(n, i, blink, text); }
 
     function undbold(i) { return seq('bold', i, und2, link, und2); }
@@ -191,9 +197,11 @@ var SaintMarc = (function() {
     function reduce(o) {
       var a = arguments[1] || [];
       if (isStr(o)) {
-        if (o.length > 1) a.push(isStr(a[a.length - 1]) ? a.pop() + o : o); }
-      else if (Array.isArray(o)) { o.forEach(function(e) { reduce(e, a); }); }
-      else { a.push(o); }
+        if (o.length > 0) a.push(isStr(a[a.length - 1]) ? a.pop() + o : o); }
+      else if (Array.isArray(o)) {
+        o.forEach(function(e) { reduce(e, a); }); }
+      else {
+        a.push(o); }
       return a; }
 
     var nmake = function(t, as, cn) {
@@ -206,11 +214,7 @@ var SaintMarc = (function() {
       return reduce(rwcn(t, arguments[1])); }
     var rwt = function(t) {
       return t.string(); };
-    var rw = function(t, name) {
-      var tt = t.lookup(name);
-      return tt ? rewrite(tt) : null; };
 
-    var rewrite_wsstar = rwt;
     var rewrite_t = rwt;
 
     var rewrite_link = function(t) {
@@ -224,7 +228,6 @@ var SaintMarc = (function() {
 
     var rewrite_text = rrcn;
     var rewrite_piece = rrcn;
-
     var rewrite_content = rrcn;
 
   }); // end ContentParser
@@ -447,11 +450,27 @@ var SaintMarc = (function() {
 
     opts = opts || {};
 
+    if (opts.debug === 3) return ContentParser.parse(s, opts);
+
     var blocks = parseBlocks(s, opts);
 
     if (opts.debug === 'blocks') return blocks;
 
     return parseNodes(blocks, opts);
+  };
+
+  this.toPre = function(s, opts) {
+
+    opts = opts || {};
+
+    return self.parse(s, opts).toPre();
+  };
+
+  this.toHtml = function(s, opts) {
+
+    opts = opts || {};
+
+    return self.parse(s, opts).toHtml();
   };
 
   //
