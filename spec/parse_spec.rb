@@ -659,6 +659,11 @@ consequat.
           ["a", {"href"=>"https://b.example.org/l?a=b#fragment"}, [
             "https://b.example.org/l?a=b#fragment"]]]],
 
+      'this is a <a href="http://example.org/link">link</a>' =>
+        ["p", {}, [
+          "this is a ",
+          ["a", {"href"=>"http://example.org/link"}, ["link"]]]],
+
     }.each do |k, v|
 
       kk = k.split("\n").first[0, 35]
