@@ -192,7 +192,7 @@ var SaintMarc = (function() {
     function tu(i) { return alt(n, i, turl, th); }
     function tuoh(i) { return alt(n, i, tu, thtm); }
     function tnuh(i) { return rex('t', i, /[^_*()[\]h<]+/); }
-    function txt(i) { return seq(n, i, tnuh, tuoh, '?'); }
+    function txt(i) { return alt(n, i, tnuh, tuoh); }
 
                // back to "piece"
                //
@@ -339,6 +339,23 @@ var SaintMarc = (function() {
       return SaintMarcNode.make(a[0], {}, cn);
     },
   });
+  var HtmlBlock = odefine(Block, {
+    lineType: '<',
+    accept: function(line) {
+      return ! this.closed; },
+    push: function(line) {
+      this.tag = this.tag || line.match(/^<([^ >]+)/)[1];
+      var m = line.match(/^<\/([^>]+)>$/);
+      this.closed = (m && m[1] === this.tag);
+      this.lines.push(line); return line; },
+    toNode: function() {
+var s = this.lines.join('');
+var x = parseContent(s);
+return SaintMarcNode.make('div', {}, x);
+//var j = JSON.stringify(x);
+//return SaintMarcNode.make('div', {}, [ s ]);
+    },
+  });
   var JumpBlock = odefine(Block, {
     lineType: '',
   });
@@ -357,16 +374,6 @@ var SaintMarc = (function() {
     lineType: 'hr',
     accept: function(line) { return false; },
     toA: function() { return [ 'hr', [] ]; },
-  });
-  var HtmlBlock = odefine(Block, {
-    lineType: '<',
-    accept: function(line) {
-      return ! this.closed; },
-    push: function(line) {
-      this.tag = this.tag || line.match(/^<([^ >]+)/)[1];
-      var m = line.match(/^<\/([^>]+)>$/);
-      this.closed = (m && m[1] === this.tag);
-      this.lines.push(line); return line; },
   });
   var QuoteBlock = odefine(Block, {
     lineType: '>',

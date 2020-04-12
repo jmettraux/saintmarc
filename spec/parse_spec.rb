@@ -560,43 +560,53 @@ consequat.
             ["ol", [["li", ["alpha", "bravo"]]]]]],
           ["li", ["over."]]]]],
 
-    "# header 1\n" +
-    "## header 1.1\n" +
-    "# header 2\n" =>
-      [["h1", "header 1"], ["h2", "header 1.1"], ["h1", "header 2"]],
+      "# header 1\n" +
+      "## header 1.1\n" +
+      "# header 2\n" =>
+        [["h1", "header 1"], ["h2", "header 1.1"], ["h1", "header 2"]],
 
-    "# header 1\n" +
-    "---\n" +
-    "# header 2\n" =>
-      [["h1", "header 1"], ["hr", []], ["h1", "header 2"]],
+      "# header 1\n" +
+      "---\n" +
+      "# header 2\n" =>
+        [["h1", "header 1"], ["hr", []], ["h1", "header 2"]],
 
-    "<ul>\n" +
-    "  <li>dark horse live stream 5th</li>\n" +
-    "</ul>\n" =>
-      [["<", ["<ul>", "  <li>dark horse live stream 5th</li>", "</ul>"]]],
+      "<ul>\n" +
+      "  <li>dark horse live stream 5th</li>\n" +
+      "</ul>\n" =>
+        [["<", ["<ul>", "  <li>dark horse live stream 5th</li>", "</ul>"]]],
 
-    "* list\n" +
-    "* that is followed\n" +
-    "- by a list\n" =>
-      [["div", [
-        ["ul", [["li", ["list"]], ["li", ["that is followed"]]]],
-        ["ul", [["li", ["by a list"]]]]]]],
+      "* list\n" +
+      "* that is followed\n" +
+      "- by a list\n" =>
+        [["div", [
+          ["ul", [["li", ["list"]], ["li", ["that is followed"]]]],
+          ["ul", [["li", ["by a list"]]]]]]],
 
-    "---\n" +
-    "***\n" +
-    "___\n" =>
-      [["hr", []], ["hr", []], ["hr", []]],
+      "---\n" +
+      "***\n" +
+      "___\n" =>
+        [["hr", []], ["hr", []], ["hr", []]],
 
-    "> this is a blockquote\n" =>
-      [["blockquote", ["this is a blockquote"]]],
+      "> this is a blockquote\n" =>
+        [["blockquote", ["this is a blockquote"]]],
 
-    "> another blockquote\n" +
-    "> on two lines\n" +
-    "not a blockquote\n" +
-    "> yet another blockquote\n" =>
-      [["blockquote", ["another blockquote", "on two lines"]],
-       ["p", ["not a blockquote"]],
-       ["blockquote", ["yet another blockquote"]]],
+      "> another blockquote\n" +
+      "> on two lines\n" +
+      "not a blockquote\n" +
+      "> yet another blockquote\n" =>
+        [["blockquote", ["another blockquote", "on two lines"]],
+         ["p", ["not a blockquote"]],
+         ["blockquote", ["yet another blockquote"]]],
+
+      "<table>\n" +
+      "  <tr><td>alpha</td><td>bravo</td></tr>\n" +
+      "  <tr><td>charly</td><td>delta</td></tr>\n" +
+      "</table>" =>
+        [["<", [
+          "<table>",
+          "  <tr><td>alpha</td><td>bravo</td></tr>",
+          "  <tr><td>charly</td><td>delta</td></tr>",
+          "</table>"]]],
 
     }.each do |k, v|
 
@@ -664,6 +674,15 @@ consequat.
           "this is a ",
           ["a", {"href"=>"http://example.org/link"}, ["link"]]]],
 
+      "<div class=\"nada\">it's a <b>hit</b></div>\n" =>
+        [],
+
+      "<table>\n" +
+      "  <tr><td>alpha</td><td>bravo</td></tr>\n" +
+      "  <tr><td>charly</td><td>delta</td></tr>\n" +
+      "</table>" =>
+        [],
+
     }.each do |k, v|
 
       kk = k.split("\n").first[0, 35]
@@ -671,10 +690,8 @@ consequat.
 
       it "parses \"#{kk}...\" to #{vv}..." do
 
-        #r = js("return SaintMarc.parse(#{k.inspect});");
-        #pp r
         r = js("return SaintMarc.parse(#{k.inspect}).toArray();");
-        #pp r
+pp r
 
         expect(r).to eq(v)
       end
