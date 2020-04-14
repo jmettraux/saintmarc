@@ -674,14 +674,23 @@ consequat.
           "this is a ",
           ["a", {"href"=>"http://example.org/link"}, ["link"]]]],
 
-      "<div class=\"nada\">it's a <b>hit</b></div>\n" =>
-        [],
+      "<div class=\"nada\">it's a <b>hit</b> right?</div>\n" =>
+        ["div", {}, [
+          ["div", {"class"=>"nada"}, [
+            "it's a ",
+            ["b", {}, ["hit"]],
+            " right?"]]]],
 
       "<table>\n" +
       "  <tr><td>alpha</td><td>bravo</td></tr>\n" +
       "  <tr><td>charly</td><td>delta</td></tr>\n" +
       "</table>" =>
-        [],
+        ["div", {}, [
+          ["table", {}, [
+            "  ",
+            ["tr", {}, [["td", {}, ["alpha"]], ["td", {}, ["bravo"]]]],
+            "  ",
+            ["tr", {}, [["td", {}, ["charly"]], ["td", {}, ["delta"]]]]]]]],
 
     }.each do |k, v|
 
@@ -691,7 +700,7 @@ consequat.
       it "parses \"#{kk}...\" to #{vv}..." do
 
         r = js("return SaintMarc.parse(#{k.inspect}).toArray();");
-pp r
+#pp r
 
         expect(r).to eq(v)
       end
