@@ -23,9 +23,24 @@
 
     <h2>in:</h2>
     <textarea id="in">
-&lt;div class="nada"&gt;it's a &lt;b&gt;hit&lt;/b&gt; right?&lt;/div&gt;
+- alice
+- bob
+  * charles
+  * david *goliath*
+    1. eric
+    2. friedrich
+    gustav
+  * heinrich
+- immanuel
+  10. john
     </textarea>
 <!--
+- first list item
+  also first list item
+- second list item
+
+&lt;div class="nada"&gt;it's a &lt;b&gt;hit&lt;/b&gt; right?&lt;/div&gt;
+
 &lt;table&gt;
   &lt;tr&gt;&lt;td&gt;alpha&lt;/td&gt;&lt;td&gt;bravo&lt;/td&gt;&lt;/tr&gt;
   &lt;tr>&lt;td&gt;charly&lt;/td&gt;&lt;td&gt;delta&lt;/td&gt;&lt;/tr&gt;
@@ -65,7 +80,10 @@ Click [here](http://example.com/).
 
         var s = H.elt('#in').value.trim();
 
-        try { clog(SaintMarc.parse(s)); } catch(err) {} // debug :-)
+        try { clog(SaintMarc.parse(s)); }
+        catch(err) { clog('(parsing failed)') } // debug :-)
+        //try { clog(JSON.stringify(SaintMarc.parse(s), null, 2)); }
+        //catch(err) { clog('(parsing failed)') } // debug :-)
 
         // #tree
         //

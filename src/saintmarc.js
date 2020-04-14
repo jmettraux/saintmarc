@@ -309,6 +309,7 @@ var SaintMarc = (function() {
     if (typeof o.make === 'function') {
       o.make.apply(o, Array.prototype.slice.call(arguments, 1));
     }
+    if (arguments[1]) o._name = arguments[1];
     return o;
   };
   var odefine = function(object, properties) {
@@ -357,11 +358,7 @@ var SaintMarc = (function() {
       this.closed = (m && m[1] === this.tag);
       this.lines.push(line); return line; },
     toNode: function() {
-var s = this.lines.join('');
-var x = parseContent(s);
-return SaintMarcNode.make('div', {}, x);
-//var j = JSON.stringify(x);
-//return SaintMarcNode.make('div', {}, [ s ]);
+      return SaintMarcNode.make('div', {}, parseContent(this.lines.join('')));
     },
   });
   var JumpBlock = odefine(Block, {
@@ -453,6 +450,28 @@ return SaintMarcNode.make('div', {}, x);
       var roots = nodes.filter(function(n) { return n.root; });
       return (roots.length > 1) ? [ 'div', roots ] : roots[0];
     },
+    toNode: function() {
+      var liToNode = function(t) {
+        var isStr = function(o) { return typeof(o) === 'string'; };
+        var cn = t[1]
+          .reduce(
+            function(ac, c) {
+              if (isStr(c) && isStr(ac[ac.length - 1])) {
+                ac.push(ac.pop() + '\n' + c); }
+              else {
+                ac.push(c); }
+              return ac; },
+            [])
+          .reduce(
+            function(ac, c) {
+              if (isStr(c)) ac = ac.concat(parseContent(c));
+              else ac.push(liToNode(c));
+              return ac; },
+            []);
+        return SaintMarcNode.make(t[0], {}, cn);
+      };
+      return liToNode(this.toA());
+    },
   });
 
   //
@@ -472,12 +491,12 @@ return SaintMarcNode.make('div', {}, x);
       else if (lt === '') k = JumpBlock;
     if ( ! k) throw "don't know what Block to make out of '" + lt + "'";
 
-    var b = omake(k); b.push(line); return b;
+    var b = omake(k, lt); b.push(line); return b;
   };
 
   var parseBlocks = function(s, opts) {
 
-    var currentBlock = omake(ParaBlock);
+    var currentBlock = omake(ParaBlock, 'pb');
     var blocks = [ currentBlock ];
 
     s

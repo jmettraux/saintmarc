@@ -12,14 +12,22 @@ describe 'SaintMarc' do
 
   describe '.parse()' do
 
-    it 'returns null if it cannot parse' do
+    it 'fails if it receives something other than a string' do
 
-      expect(js %{
-        return SaintMarc.parse(null);
-      }).to eq(
-        nil
+      expect {
+        js %{ return SaintMarc.parse(null); }
+      }.to raise_error(
+        ExecJS::ProgramError, /input is not a string/
       )
     end
+
+    #it 'returns null if it cannot parse' do
+    #  expect(js %{
+    #    return SaintMarc.parse(';
+    #  }).to eq(
+    #    nil
+    #  )
+    #end
 
     it 'parses a markdown string and returns a tree' do
 
@@ -31,10 +39,9 @@ describe 'SaintMarc' do
             'This is another paragraph\n')
           .toArray();
       }).to eq(
-        [ 'doc', {}, [
-          [ 'p', {}, [ [ 'div', {}, 'This is our test' ] ] ],
-          [ 'p', {}, [ [ 'div', {}, 'This is another paragraph' ] ] ],
-        ] ]
+        ["div", {}, [
+          ["p", {}, ["This is our test"]],
+          ["p", {}, ["This is another paragraph"]]]]
       )
     end
 
@@ -113,6 +120,7 @@ describe 'SaintMarc' do
     end
 
     it 'parses lists with multiple paragraphs' do
+
       s =
         %{
 - first list item
@@ -123,14 +131,9 @@ describe 'SaintMarc' do
         js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
-        ["doc",
-         {},
-         [["ul",
-           {},
-           [["li", {}, [
-             ["p", {}, "first list item"],
-             ["p", {}, "also first list item"]]],
-            ["li", {}, [["p", {}, "second list item"]]]]]]]
+        ["ul", {}, [
+          ["li", {}, ["first list item\nalso first list item"]],
+          ["li", {}, ["second list item"]]]]
       )
     end
 
@@ -153,30 +156,21 @@ describe 'SaintMarc' do
         js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
-        ["doc",
-         {},
-         [["ul",
-           {},
-           [["li", {}, [["p", {}, "alice"]]],
-            ["li",
-             {},
-             [["p", {}, "bob"],
-              ["ul",
-               {},
-               [["li", {}, [["p", {}, "charles"]]],
-                ["li",
-                 {},
-                 [["p", {}, "david"],
-                  ["ol",
-                   {},
-                   [["li", {}, [["p", {}, "eric"]]],
-                    ["li", {}, [["p", {}, "friedrich"]]]]],
-                  ["p", {}, "gustav"]]],
-                ["li", {}, [["p", {}, "heinrich"]]]]]]],
-            ["li",
-             {},
-             [["p", {}, "immanuel"],
-              ["ol", {}, [["li", {}, [["p", {}, "john"]]]]]]]]]]]
+        ["ul", {}, [
+          ["li", {}, ["alice"]],
+          ["li", {}, [
+            "bob",
+            ["ul", {}, [
+              ["li", {}, ["charles"]],
+              ["li", {}, [
+                "david",
+                ["ol", {}, [
+                  ["li", {}, ["eric"]],
+                  ["li", {}, ["friedrich\ngustav"]]]]]],
+              ["li", {}, ["heinrich"]]]]]],
+          ["li", {}, [
+            "immanuel",
+            ["ol", {}, [["li", {}, ["john"]]]]]]]]
       )
     end
 
@@ -193,16 +187,9 @@ describe 'SaintMarc' do
         js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
-        ["doc",
-         {},
-         [["ol",
-           {},
-           [["li", {}, [["p", {}, "alpha"]]],
-            ["li", {}, [["p", {}, "bravo"]]]]],
-          ["ul",
-           {},
-           [["li", {}, [["p", {}, "charly"]]],
-            ["li", {}, [["p", {}, "delta"]]]]]]]
+        ["div", {}, [
+          ["ol", {}, [["li", {}, ["alpha"]], ["li", {}, ["bravo"]]]],
+          ["ul", {}, [["li", {}, ["charly"]], ["li", {}, ["delta"]]]]]]
       )
     end
 
@@ -219,16 +206,13 @@ describe 'SaintMarc' do
         js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
-        ["doc",
-         {},
-         [["ul",
-           {},
-           [["li", {}, [["p", {}, "alpha"]]],
-            ["li", {}, [["p", {}, "bravo"]]]]],
-          ["ol",
-           {},
-           [["li", {}, [["p", {}, "charly"]]],
-            ["li", {}, [["p", {}, "delta"]]]]]]]
+        ["div", {}, [
+          ["ul", {}, [
+            ["li", {}, ["alpha"]],
+            ["li", {}, ["bravo"]]]],
+          ["ol", {}, [
+            ["li", {}, ["charly"]],
+            ["li", {}, ["delta"]]]]]]
       )
     end
 
@@ -246,16 +230,9 @@ One on two lines.
         js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
-        ["doc",
-         {},
-         [["ol",
-           {},
-           [["li", {}, [
-            ["p", {}, "alpha"]]], ["li", {}, [["p", {}, "bravo"]]]]],
-          ["p",
-           {},
-           [["div", {}, "It is followed by a paragraph."],
-            ["div", {}, "One on two lines."]]]]]
+        ["div", {}, [
+          ["ol", {}, [["li", {}, ["alpha"]], ["li", {}, ["bravo"]]]],
+          ["p", {}, ["It is followed by a paragraph.\nOne on two lines."]]]]
       )
     end
 
@@ -272,16 +249,11 @@ A paragraph with two lines (divs).
         js "return SaintMarc.parse(#{s.inspect}).toArray();"
 
       expect(t).to eq(
-        ["doc",
-         {},
-         [["p",
-           {},
-           [["div", {}, "This a test paragraph."],
-            ["div", {}, "A paragraph with two lines (divs)."]]],
-          ["ul",
-           {},
-           [["li", {}, [["p", {}, "followed by a list"]]],
-            ["li", {}, [["p", {}, "a list"]]]]]]]
+       ["div", {}, [
+         ["p", {}, []],
+         ["ul", {}, [
+           ["li", {}, ["followed by a list"]],
+           ["li", {}, ["a list"]]]]]]
       )
     end
 
@@ -500,6 +472,13 @@ consequat.
       "Simple para.\n" +
       "That goes on a second line." =>
         [ [ 'p', [ 'Simple para.', 'That goes on a second line.' ] ] ],
+
+      "- first list item\n" +
+      "  also first list item\n" +
+      "- second list item" =>
+        [["ul", [
+          ["li", ["first list item", "also first list item"]],
+          ["li", ["second list item"]]]]],
 
       "A list follows this para\n" +
       "* alpha\n" +
