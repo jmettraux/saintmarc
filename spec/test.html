@@ -23,7 +23,7 @@
 
     <h2>in:</h2>
     <textarea id="in">
-&lt;div class="nada"&gt;it's a &lt;b&gt;hit&lt;/b&gt;&lt;/div&gt;
+&lt;div class="nada"&gt;it's a &lt;b&gt;hit&lt;/b&gt; right?&lt;/div&gt;
     </textarea>
 <!--
 &lt;table&gt;
@@ -64,6 +64,8 @@ Click [here](http://example.com/).
       var render = function() {
 
         var s = H.elt('#in').value.trim();
+
+        try { clog(SaintMarc.parse(s)); } catch(err) {} // debug :-)
 
         // #tree
         //

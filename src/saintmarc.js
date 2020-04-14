@@ -74,10 +74,17 @@ var SaintMarcNode = {
       os.out.push(' ', k, ': ', JSON.stringify(this.attributes[k]));
     }
 
-    this.children.forEach(function(c) {
-      if (typeof c === 'string') os.out.push(' ', JSON.stringify(c));
-      else c.toPre(Object.assign({}, os, { depth: depth + 1 }));
-    });
+    if (this.children.length === 1 && (typeof this.children[0] === 'string')) {
+      os.out.push(' ', JSON.stringify(this.children[0]));
+    }
+    else {
+      this.children.forEach(function(c) {
+        if (typeof c === 'string') {
+          os.out.push('\n', ind, '  ', JSON.stringify(c)); }
+        else {
+          c.toPre(Object.assign({}, os, { depth: depth + 1 })); }
+      });
+    }
 
     return out ? null : os.out.join('');
   },
@@ -255,7 +262,8 @@ var SaintMarc = (function() {
         var v = at.lookup('htavv'); v = v ? v.string().slice(1, -1) : '';
         atts[k] = v;
       });
-      var bt = t.lookup('hbody'); var cn = bt ? rwcn(bt) : [];
+      var cn = [];
+      t.gather('hbody').forEach(function(bt) { cn = cn.concat(rwcn(bt)); });
       return nmake(tag, atts, cn);
     };
 
